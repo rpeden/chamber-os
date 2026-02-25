@@ -2,7 +2,7 @@
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Header, Media } from '@/payload-types'
 
@@ -54,6 +54,30 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
   const [openDropdown, setOpenDropdown] = useState<number | null>(null)
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
+  const headerRef = useRef<HTMLElement>(null)
+
+  // Measure header height and expose it as a CSS variable so the
+  // fullBleed hero can pull itself up behind the header without
+  // resorting to magic numbers. ResizeObserver handles responsive changes.
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        document.documentElement.style.setProperty(
+          '--header-height',
+          `${entry.contentRect.height}px`,
+        )
+      }
+    })
+
+    observer.observe(el)
+    // Set initial value immediately
+    document.documentElement.style.setProperty('--header-height', `${el.offsetHeight}px`)
+
+    return () => observer.disconnect()
+  }, [])
 
   // Reset theme and close mobile menu on route change
   useEffect(() => {
@@ -84,7 +108,11 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
   }, [openDropdown])
 
   return (
-    <header className={cn('relative z-20 w-full')} {...(theme ? { 'data-theme': theme } : {})}>
+    <header
+      ref={headerRef}
+      className={cn('relative z-20 w-full')}
+      {...(theme ? { 'data-theme': theme } : {})}
+    >
       {/* ── Utility Nav (top bar) ── */}
       {(utilityNav.length > 0 || socialLinks.length > 0) && (
         <div className="bg-theme-primary text-white text-sm hidden md:block">
