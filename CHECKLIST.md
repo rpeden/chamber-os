@@ -152,27 +152,34 @@ These blocks pull from the collections defined in Phase 5.
 
 ---
 
-## Phase 7: Admin UX
+## Phase 7: Admin UX & Custom Views
 
-The default Payload admin is functional but looks like a developer tool. Chamber staff need it to feel approachable — clear labels, logical grouping, helpful descriptions, and a dashboard that surfaces what matters.
+The default Payload admin is functional but looks like a developer tool. Chamber staff need it to feel approachable — clear labels, logical grouping, helpful descriptions, and a dashboard that surfaces what matters. Business workflows (CRM, event management) get purpose-built custom views, not generic collection editors.
 
 ### Dashboard
 - [ ] **7.1** Custom dashboard component — replace the default "welcome" block with a Chamber OS dashboard showing: recent events (next 5 upcoming), recent orders (last 10), quick-action buttons ("Create Event", "New News Post", "Add Member")
 - [ ] **7.2** At-a-glance stats panel — total active members, upcoming events count, tickets sold this month (queries run server-side)
 
+### Custom Admin Views
+- [ ] **7.3** Register custom views in `payload.config.ts` under `admin.components.views` — these render inside the admin shell (same sidebar, same auth) but with purpose-built UIs
+- [ ] **7.4** **Events Manager view** (`/admin/events-manager`) — calendar/list hybrid showing upcoming events, ticket sales status, quick actions (duplicate event, create from template). Not a replacement for the Events collection CRUD, but a workflow-oriented overview.
+- [ ] **7.5** **CRM Dashboard view** (`/admin/crm`) — member overview with search/filter, membership status breakdown, renewal alerts, recent activity. Queries the Members collection via Local API.
+- [ ] **7.6** **Orders view** (`/admin/orders-dashboard`) — filterable order list with status, revenue summary, export capability. Purpose-built for staff who need to check ticket sales, not navigate a generic collection list.
+- [ ] **7.7** Custom sidebar nav group component (`afterNavLinks`) — adds "Chamber Management" section to the sidebar with links to the custom views above
+
 ### Collection UX
-- [ ] **7.3** Descriptive field labels and `description` help text on every non-obvious field across all collections — no developer jargon, plain English (e.g., "Service Fee" description: "A small fee added to each ticket to cover platform costs. Leave as 'None' if you don't want to charge extra.")
-- [ ] **7.4** Sensible `admin.defaultColumns` on all list views — Events: title, date, status, ticketing; Members: business name, contact name, tier, status; Orders: event title, purchaser, status, date
-- [ ] **7.5** Admin groups — organize collections in the sidebar: "Content" (Pages, News), "Events" (Events, Event Templates, Orders), "Members" (Members, Membership Tiers), "Settings" (Site Settings, Navigation, Team, Users)
-- [ ] **7.6** `useAsTitle` on all collections — Events use title, Members use business name, Team uses name, etc.
-- [ ] **7.7** Collapsed-by-default for complex nested fields (ticket-types array, service fee group) so the event form doesn't look overwhelming on first load
+- [ ] **7.8** Descriptive field labels and `description` help text on every non-obvious field across all collections — no developer jargon, plain English (e.g., "Service Fee" description: "A small fee added to each ticket to cover platform costs. Leave as 'None' if you don't want to charge extra.")
+- [ ] **7.9** Sensible `admin.defaultColumns` on all list views — Events: title, date, status, ticketing; Members: business name, contact name, tier, status; Orders: event title, purchaser, status, date
+- [ ] **7.10** Admin groups — organize collections in the sidebar: "Content" (Pages, News, Media), "Events" (Events, Event Templates), "Members" (Members, Membership Tiers), "Settings" (Site Settings, Header, Footer, Team, Users)
+- [ ] **7.11** `useAsTitle` on all collections — Events use title, Members use business name, Team uses name, etc.
+- [ ] **7.12** Collapsed-by-default for complex nested fields (ticket-types array, service fee group) so the event form doesn't look overwhelming on first load
 
 ### Block Picker UX
-- [ ] **7.8** Descriptive block labels with `admin.description` — staff should know what each block does without trying it (e.g., "Card Grid: A row of cards, each with an optional image, heading, and text. Great for team bios or service highlights.")
-- [ ] **7.9** Logical block ordering in the picker — most-used blocks first (hero, text-columns, card-grid, image-text), specialized blocks later (map-embed, contact-form)
+- [ ] **7.13** Descriptive block labels with `admin.description` — staff should know what each block does without trying it (e.g., "Card Grid: A row of cards, each with an optional image, heading, and text. Great for team bios or service highlights.")
+- [ ] **7.14** Logical block ordering in the picker — most-used blocks first (hero, text-columns, card-grid, image-text), specialized blocks later (map-embed, contact-form)
 
 ### Live Preview
-- [ ] **7.10** Verify live preview works for all new blocks and collections — the template already has breakpoint config, but new blocks need to render correctly in preview mode
+- [ ] **7.15** Verify live preview works for all new blocks and collections — the template already has breakpoint config, but new blocks need to render correctly in preview mode
 
 ---
 
@@ -187,12 +194,15 @@ The default Payload admin is functional but looks like a developer tool. Chamber
 
 ---
 
-## Phase 9: Remaining Collections
+## Phase 9: Remaining Collections & Member Data
+
+Members, Membership Tiers, and Orders are **Payload collections** (for data storage, access control, and basic CRUD). The purpose-built admin views for CRM and order management (Phase 7) query these same collections — the distinction is data layer (collection) vs. presentation layer (custom view).
 
 ### Members
 - [ ] **9.1** Create Members collection — contact info (name, email, phone, address), business name, website, social links, membership tier (relationship), status (active/lapsed/pending), renewal date, notes (rich text)
-- [ ] **9.2** Add access control — admin/staff full access, members can read own record (future portal), public read limited fields for directory (future)
+- [ ] **9.2** Add access control — admin/staff full access, members can read own record (for portal), public read limited fields for directory (future)
 - [ ] **9.3** Feature-flag gate the collection
+- [ ] **9.4** Add `admin.group: 'Members'` for sidebar organization
 
 ### Membership Tiers
 - [ ] **9.4** Create Membership Tiers collection — name, annual price (number), features list (array of text), description (rich text), display order, Stripe Price ID (text, optional)
@@ -278,6 +288,51 @@ Two tracks: easy third-party integration (Google Analytics et al.) and lightweig
 
 ---
 
+## Phase 15: Member Portal (Post-MVP)
+
+The member portal is a **Next.js sub-app** under `/members/*` — standard React pages with their own auth, not Payload admin views. It shares the same database (reads/writes Payload's Members collection) but has a completely separate UX designed for members, not staff.
+
+### Auth
+- [ ] **15.1** Install and configure NextAuth/AuthJS with credentials provider (email + password)
+- [ ] **15.2** Member registration flow — email verification, profile creation, links to Members collection record
+- [ ] **15.3** Password reset flow
+- [ ] **15.4** Session management — JWT or database sessions, configurable timeout
+
+### Portal Pages
+- [ ] **15.5** Member dashboard (`/members/dashboard`) — overview of membership status, upcoming events, recent activity
+- [ ] **15.6** Profile editor (`/members/profile`) — edit business info, contact details, social links, logo. Writes to the Members Payload collection via API route.
+- [ ] **15.7** Membership status page — current tier, renewal date, payment history, upgrade/downgrade options
+- [ ] **15.8** Order history — past ticket purchases, downloadable receipts
+- [ ] **15.9** Event RSVP — browse upcoming events, register/purchase tickets from within the portal
+
+### Public Directory
+- [ ] **15.10** Member directory page (`/members/directory`) — searchable, filterable list of active members with public profile info. No auth required for browsing; member controls which fields are public.
+- [ ] **15.11** Individual member profile page (`/members/directory/[slug]`) — public-facing business profile
+
+### Feature Flag
+- [ ] **15.12** Gate the entire portal behind `memberPortal` feature flag — routes return 404 when disabled
+
+---
+
+## Phase 16: Forums & Governance (Future)
+
+These build on the member portal and are part of the long-term "democracy in a box" vision. Not in MVP scope but documented to ensure architecture decisions don't block them.
+
+### Forums
+- [ ] **16.1** Discussion board data model — topics, threads, posts (likely Payload collections or direct DB tables depending on scale)
+- [ ] **16.2** Forum UI — member-only, moderation tools for staff
+- [ ] **16.3** "Official meeting" designation on threads — defined open/close dates, participation tracking for quorum
+- [ ] **16.4** Email notifications for subscribed threads
+
+### Voting & Elections
+- [ ] **16.5** Motion/resolution creation — staff creates motion, defines voting window
+- [ ] **16.6** Ballot casting UI — one-member-one-vote enforcement, secret ballot option
+- [ ] **16.7** Board elections — nomination period, candidate profiles, ranked-choice or plurality voting
+- [ ] **16.8** Results tabulation and publication
+- [ ] **16.9** Audit trail — who voted and when (but not how, for secret ballots)
+
+---
+
 ## Running Totals
 
 | Category | Items |
@@ -285,6 +340,19 @@ Two tracks: easy third-party integration (Google Analytics et al.) and lightweig
 | Globals | 1 new (site-settings), 2 enhanced (header, footer) |
 | Collections | 6 new (Events, Event Templates, Orders, Members, Membership Tiers, Team), 1 repurposed (Posts→News) |
 | Blocks | ~13 new/reworked (hero rework, text-columns, card-grid, icon-grid, mixed-content-row, image-text, events-list, sponsors-grid, testimonials, cta-banner, news-feed, stats-bar, membership-tiers, contact-form, map-embed) |
-| Admin UX | Custom dashboard, collection grouping, descriptive labels, block picker improvements |
+| Custom Admin Views | 4 (Chamber OS dashboard, Events Manager, CRM Dashboard, Orders Dashboard) |
+| Admin UX | Collection grouping, descriptive labels, block picker improvements, custom sidebar nav |
+| Member Portal | Next.js sub-app with own auth (NextAuth/AuthJS), ~8 pages (dashboard, profile, directory, etc.) |
 | Analytics | GA/GTM/custom script injection, optional built-in page view tracking (log-based, non-blocking) |
 | Infrastructure | Theme system, feature flags, Stripe integration, env validation |
+| Future (Post-MVP) | Forums, voting/elections, governance tools |
+
+### Architecture Boundaries
+
+| What | Where | Why |
+|---|---|---|
+| Pages, Posts, Media, Site Settings | Payload collections + globals | Content management — Payload's CRUD is perfect for this |
+| Events, Members, Orders, Team | Payload collections | Structured data storage + access control |
+| CRM dashboard, event management | Custom admin views (inside Payload admin shell) | Purpose-built workflow UIs, not generic CRUD |
+| Member portal, checkout, directory | Next.js pages (`/members/*`, `/checkout/*`) | Application logic, separate auth, member-facing |
+| Stripe, email, business logic | Next.js API routes + `lib/` services | Pure application code, no CMS involvement |

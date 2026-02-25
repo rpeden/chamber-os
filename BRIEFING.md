@@ -19,10 +19,68 @@
 | Database | PostgreSQL (or SQLite for local dev) |
 | Payments | Stripe (Payment Intents + Webhooks + optionally Billing for recurring) |
 | File Storage | Local for dev → Cloudflare R2 or S3 for production |
-| Auth | Payload's built-in auth for admin; public-facing auth TBD |
+| Auth | Payload's built-in auth for admin; NextAuth/AuthJS for member portal |
 | Styling | Tailwind CSS with CSS custom properties for theming |
 
-### Core Principle: Separate Editing from Output
+### Core Principle: Payload for Content, Next.js for Everything Else
+
+Chamber OS is **not** a CMS with business features bolted on. It's a business platform that *includes* content management. The architecture reflects this split:
+
+**Payload CMS handles content:**
+- Pages, Posts/News, Media, Categories — classic CMS content
+- Site Settings, Header, Footer — site configuration globals
+- Events (public-facing listings) — structured content that benefits from Payload's CRUD, versioning, and admin UI
+- Members, Membership Tiers, Team — structured data that lives in Payload collections for easy admin management
+
+**Next.js handles application logic:**
+- Member portal (`/members/*`) — a semi-separate sub-app with its own auth (NextAuth/AuthJS), purpose-built dashboard pages, profile editing, payment history. Standard React pages, not Payload views.
+- Event registration & checkout — API routes + Stripe, purpose-built UI
+- Board governance, voting, forums (future) — pure application code
+- Public member directory, event calendar with RSVP — standard Next.js pages querying the database
+
+**Unified admin via custom Payload views:**
+- Payload's admin panel supports custom views: purpose-built React pages that live inside the admin shell (same sidebar, same auth, same layout) but render whatever UI we want. These are registered in `payload.config.ts` under `admin.components.views`.
+- CRM dashboard, events management, order management, communications — these are custom admin views with workflow-oriented UIs, not generic collection list/edit screens.
+- Custom nav groups organize the sidebar: "Content" (Pages, Posts, Media), "Chamber Management" (custom views for CRM, events, orders), "Settings" (Site Settings, Header, Footer).
+- Result: one login, one sidebar, one app. Staff never leaves the admin interface whether they're editing a page or managing a membership renewal.
+
+**Shared database, different interfaces:**
+- Payload collections (Members, Events, Orders, etc.) store the data in PostgreSQL.
+- Custom admin views query the same collections via Payload's Local API.
+- The member portal (public-facing) queries the same data via API routes or direct database access.
+- No data duplication, no sync problems. One source of truth, multiple purpose-built interfaces.
+
+### Directory Structure (Target)
+
+```
+src/
+  app/
+    (payload)/           ← Payload admin (content management + custom views)
+    (frontend)/          ← Public site
+      page.tsx                ← Payload-managed (blocks, hero, etc.)
+      events/                 ← Payload collection for public display
+      posts/                  ← Payload collection for blog/news
+      members/                ← Pure Next.js — member portal (own auth)
+        login/
+        dashboard/
+        profile/
+        directory/
+      board/                  ← Pure Next.js — governance, voting (future)
+      api/                    ← Next.js API routes for business logic
+        stripe/
+        members/
+        voting/
+  collections/           ← Payload content & data collections
+  components/
+    admin/               ← Custom admin views (CRM dashboard, etc.)
+  lib/
+    db/                  ← Direct DB access for non-CMS operations
+    stripe/
+    email/
+    members/             ← Member service layer — plain TypeScript
+```
+
+### Principle: Separate Editing from Output
 
 The editor and the rendered output are completely decoupled. Payload stores structured JSON (block data + theme config). Next.js renders that data into clean, semantic HTML at request time or build time. **No editor scaffolding is ever shipped to the visitor's browser.**
 
@@ -369,14 +427,23 @@ These are not in scope for MVP but are part of the long-term vision. They're doc
 
 ### Member Portal (Phase 2)
 
-A self-service portal where members log in and manage their own information:
+A self-service portal where members log in and manage their own information. This is a **Next.js sub-app** under `/members/*` with its own auth system (NextAuth/AuthJS), not part of the Payload admin UI. Members never see or access Payload's admin panel.
+
+**Architecture:**
+- Auth: NextAuth/AuthJS with credentials provider (email + password), separate from Payload's admin auth
+- Data: Reads/writes the same Payload Members collection via API routes or direct DB queries
+- Pages: Standard Next.js Server Components + Client Components, no Payload involvement
+- Shared DB: The member portal and the admin CRM view both operate on the same Members data — no sync needed
+
+**Member-facing features:**
 - View and update business profile (name, address, website, social links, logo)
 - Update contact information
 - View membership status, tier, and renewal date
 - View order/payment history
 - Download invoices and receipts
+- RSVP to events, purchase tickets
 
-This reduces staff workload significantly — instead of fielding emails and manually updating records, members maintain their own data. The portal is a logged-in area of the public site, not the Payload admin panel. Members never see or access Payload's admin UI.
+This reduces staff workload significantly — instead of fielding emails and manually updating records, members maintain their own data.
 
 ### Member Forums (Phase 3)
 
@@ -471,9 +538,11 @@ The project is initialized from the Payload CMS website template. What exists:
 
 ## Notes for the Agent
 
+- **Know the boundary:** Payload for content (pages, posts, media, site config). Custom admin views for business workflows (CRM, event management, order management). Next.js pages for member-facing features (portal, checkout, directory). Don't cram application logic into Payload collections — use collections for data storage and custom views for purpose-built UIs.
 - Prefer explicit, readable code over clever abstractions — this codebase will be maintained by one developer and eventually handed off
 - All block render components should output semantic HTML with minimal wrapper divs
 - CSS should use Tailwind utility classes for layout, CSS custom properties for theme values
 - Keep Stripe logic in dedicated service files (`/lib/stripe/`), not scattered across API routes
 - Every collection should have sensible access control from the start — don't leave everything public and clean it up later
+- When modeling new features, ask: "Is this content (Payload collection) or application logic (Next.js)?" If a generic list/edit UI is sufficient, it's a collection. If it needs a workflow-oriented interface, build a custom admin view. If it's member-facing, it's a Next.js page.
 - When in doubt, check [Payload docs](https://payloadcms.com/docs) — the API is well documented and usually does what you expect

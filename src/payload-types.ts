@@ -112,10 +112,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   user: User;
@@ -1634,6 +1636,32 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: number;
+  /**
+   * Small links shown in the top bar (e.g., "Become a Member", "Member Login", "Contact"). Social icons are pulled automatically from Site Settings.
+   */
+  utilityNav?:
+    | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Primary site navigation. Each item can optionally have dropdown child links.
+   */
   navItems?:
     | {
         link: {
@@ -1651,6 +1679,29 @@ export interface Header {
           url?: string | null;
           label: string;
         };
+        /**
+         * Optional child links shown in a dropdown menu under this item.
+         */
+        children?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1663,6 +1714,45 @@ export interface Header {
  */
 export interface Footer {
   id: number;
+  /**
+   * Organize footer links into columns with headings. Contact info and social links appear automatically from Site Settings.
+   */
+  columns?:
+    | {
+        /**
+         * Column heading (e.g., "Quick Links", "Resources", "Events")
+         */
+        heading: string;
+        links?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Copyright text shown at the bottom of the footer. Use {year} and it will be replaced with the current year automatically.
+   */
+  copyright?: string | null;
+  /**
+   * Legacy flat nav links. Use Footer Columns instead.
+   */
   navItems?:
     | {
         link: {
@@ -1687,10 +1777,182 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * Manage your site branding, contact information, social links, and theme colors.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Displayed in the browser tab and fallback header text.
+   */
+  siteName: string;
+  /**
+   * Main site logo. Recommended: SVG or transparent PNG, at least 200px wide.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * A short tagline shown below the logo or in the hero area.
+   */
+  tagline?: string | null;
+  /**
+   * Full mailing address. Line breaks are preserved.
+   */
+  address?: string | null;
+  /**
+   * Main phone number (displayed as-is).
+   */
+  phone?: string | null;
+  /**
+   * General contact email address.
+   */
+  email?: string | null;
+  /**
+   * Add links to your social media profiles.
+   */
+  socialLinks?:
+    | {
+        platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin' | 'youtube' | 'tiktok';
+        /**
+         * Full URL (e.g., https://facebook.com/yourchamber)
+         */
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main brand color (hex). Used for headers, buttons, and accents.
+   */
+  primaryColor: string;
+  /**
+   * Secondary brand color (hex). Used for hover states and backgrounds.
+   */
+  secondaryColor: string;
+  /**
+   * Accent color (hex). Used for highlights and call-to-action buttons.
+   */
+  accentColor: string;
+  /**
+   * Font family for headings (h1–h6).
+   */
+  headingFont:
+    | 'system-ui, -apple-system, sans-serif'
+    | 'var(--font-geist-sans), sans-serif'
+    | "'Inter', sans-serif"
+    | "'Lora', serif"
+    | "'Merriweather', serif"
+    | "'Montserrat', sans-serif"
+    | "'Open Sans', sans-serif"
+    | "'Playfair Display', serif"
+    | "'Raleway', sans-serif"
+    | "'Roboto', sans-serif";
+  /**
+   * Font family for body text.
+   */
+  bodyFont:
+    | 'system-ui, -apple-system, sans-serif'
+    | 'var(--font-geist-sans), sans-serif'
+    | "'Inter', sans-serif"
+    | "'Lora', serif"
+    | "'Merriweather', serif"
+    | "'Montserrat', sans-serif"
+    | "'Open Sans', sans-serif"
+    | "'Playfair Display', serif"
+    | "'Raleway', sans-serif"
+    | "'Roboto', sans-serif";
+  /**
+   * Google Analytics 4 measurement ID (e.g., G-XXXXXXXXXX). Leave empty to disable.
+   */
+  gaId?: string | null;
+  /**
+   * GTM container ID (e.g., GTM-XXXXXXX). Leave empty to disable.
+   */
+  gtmId?: string | null;
+  /**
+   * Custom HTML/scripts injected into <head>. Use for third-party tracking pixels, meta tags, etc. Be careful — bad scripts can break the site.
+   */
+  customHeadScripts?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  utilityNav?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  navItems?:
+    | T
+    | {
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        children?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  columns?:
+    | T
+    | {
+        heading?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  copyright?: T;
   navItems?:
     | T
     | {
@@ -1711,23 +1973,30 @@ export interface HeaderSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer_select".
+ * via the `definition` "site-settings_select".
  */
-export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logo?: T;
+  tagline?: T;
+  address?: T;
+  phone?: T;
+  email?: T;
+  socialLinks?:
     | T
     | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
+        platform?: T;
+        url?: T;
         id?: T;
       };
+  primaryColor?: T;
+  secondaryColor?: T;
+  accentColor?: T;
+  headingFont?: T;
+  bodyFont?: T;
+  gaId?: T;
+  gtmId?: T;
+  customHeadScripts?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1778,17 +2047,6 @@ export interface BannerBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'banner';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CodeBlock".
- */
-export interface CodeBlock {
-  language?: ('typescript' | 'javascript' | 'css') | null;
-  code: string;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'code';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

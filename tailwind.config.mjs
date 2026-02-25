@@ -2,6 +2,15 @@
 const config = {
   theme: {
     extend: {
+      colors: {
+        'theme-primary': 'var(--theme-primary)',
+        'theme-secondary': 'var(--theme-secondary)',
+        'theme-accent': 'var(--theme-accent)',
+      },
+      fontFamily: {
+        'theme-heading': 'var(--theme-heading-font)',
+        'theme-body': 'var(--theme-body-font)',
+      },
       typography: () => ({
         DEFAULT: {
           css: [

@@ -2,25 +2,64 @@
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import type { Header } from '@/payload-types'
+import type { Header, Media } from '@/payload-types'
 
-import { Logo } from '@/components/Logo/Logo'
-import { HeaderNav } from './Nav'
+import { CMSLink } from '@/components/Link'
+import {
+  SearchIcon,
+  Menu,
+  X,
+  ChevronDown,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Youtube,
+} from 'lucide-react'
+import { cn } from '@/utilities/ui'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
+
+/** Map social platform slugs to Lucide icons */
+const socialIcons: Record<string, React.FC<{ className?: string }>> = {
+  facebook: Facebook,
+  twitter: Twitter,
+  instagram: Instagram,
+  linkedin: Linkedin,
+  youtube: Youtube,
+}
+
+interface SocialLink {
+  platform: string
+  url: string
+  id?: string | null
+}
 
 interface HeaderClientProps {
   data: Header
+  logo: Media | null
+  siteName: string
+  socialLinks: SocialLink[]
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
-  /* Storing the value in a useState to avoid hydration errors */
+export const HeaderClient: React.FC<HeaderClientProps> = ({
+  data,
+  logo,
+  siteName,
+  socialLinks,
+}) => {
   const [theme, setTheme] = useState<string | null>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null)
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
 
+  // Reset theme and close mobile menu on route change
   useEffect(() => {
     setHeaderTheme(null)
+    setMobileOpen(false)
+    setOpenDropdown(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
@@ -29,13 +68,225 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headerTheme])
 
+  const navItems = data?.navItems || []
+  const utilityNav = data?.utilityNav || []
+
+  const toggleDropdown = useCallback((index: number) => {
+    setOpenDropdown((prev) => (prev === index ? null : index))
+  }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (openDropdown === null) return
+    const handler = () => setOpenDropdown(null)
+    document.addEventListener('click', handler)
+    return () => document.removeEventListener('click', handler)
+  }, [openDropdown])
+
   return (
-    <header className="container relative z-20   " {...(theme ? { 'data-theme': theme } : {})}>
-      <div className="py-8 flex justify-between">
-        <Link href="/">
-          <Logo loading="eager" priority="high" className="invert dark:invert-0" />
-        </Link>
-        <HeaderNav data={data} />
+    <header className={cn('relative z-20 w-full')} {...(theme ? { 'data-theme': theme } : {})}>
+      {/* ── Utility Nav (top bar) ── */}
+      {(utilityNav.length > 0 || socialLinks.length > 0) && (
+        <div className="bg-theme-primary text-white text-sm hidden md:block">
+          <div className="container flex justify-between items-center py-1.5">
+            <nav className="flex gap-4">
+              {utilityNav.map(({ link }, i) => (
+                <CMSLink
+                  key={i}
+                  {...link}
+                  appearance="inline"
+                  className="text-white/90 hover:text-white transition-colors text-xs"
+                />
+              ))}
+            </nav>
+            {socialLinks.length > 0 && (
+              <div className="flex gap-3">
+                {socialLinks.map((social, i) => {
+                  const Icon = socialIcons[social.platform]
+                  return Icon ? (
+                    <a
+                      key={i}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/80 hover:text-white transition-colors"
+                      aria-label={social.platform}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                    </a>
+                  ) : null
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Main Nav ── */}
+      <div className="bg-background border-b border-border">
+        <div className="container flex justify-between items-center py-4">
+          {/* Logo / Site Name */}
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            {logo?.url ? (
+              <img
+                src={getMediaUrl(logo.url)}
+                alt={logo.alt || siteName}
+                className="max-h-12 w-auto"
+                loading="eager"
+              />
+            ) : (
+              <span className="text-xl font-bold text-theme-primary font-theme-heading">
+                {siteName}
+              </span>
+            )}
+          </Link>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map((item, i) => {
+              const hasChildren = item.children && item.children.length > 0
+
+              return (
+                <div
+                  key={i}
+                  className="relative"
+                  onClick={(e) => {
+                    if (hasChildren) {
+                      e.stopPropagation()
+                      toggleDropdown(i)
+                    }
+                  }}
+                >
+                  <div className="flex items-center">
+                    <CMSLink
+                      {...item.link}
+                      appearance="inline"
+                      className={cn(
+                        'px-3 py-2 text-sm font-medium text-foreground hover:text-theme-primary transition-colors rounded-md hover:bg-muted',
+                        hasChildren && 'pr-1',
+                      )}
+                    />
+                    {hasChildren && (
+                      <button
+                        className="p-1 hover:bg-muted rounded"
+                        aria-label={`Open ${item.link?.label} submenu`}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          toggleDropdown(i)
+                        }}
+                      >
+                        <ChevronDown
+                          className={cn(
+                            'w-3.5 h-3.5 transition-transform',
+                            openDropdown === i && 'rotate-180',
+                          )}
+                        />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Dropdown */}
+                  {hasChildren && openDropdown === i && (
+                    <div className="absolute top-full left-0 mt-1 min-w-48 bg-background border border-border rounded-lg shadow-lg py-2 z-50">
+                      {item.children!.map((child, j) => (
+                        <CMSLink
+                          key={j}
+                          {...child.link}
+                          appearance="inline"
+                          className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-theme-primary transition-colors"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <Link
+              href="/search"
+              className="ml-2 p-2 text-muted-foreground hover:text-theme-primary transition-colors"
+            >
+              <span className="sr-only">Search</span>
+              <SearchIcon className="w-5 h-5" />
+            </Link>
+          </nav>
+
+          {/* Mobile Hamburger */}
+          <button
+            className="md:hidden p-2 text-foreground"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-border bg-background">
+            <div className="container py-4 space-y-1">
+              {navItems.map((item, i) => {
+                const hasChildren = item.children && item.children.length > 0
+                return (
+                  <div key={i}>
+                    <div className="flex items-center justify-between">
+                      <CMSLink
+                        {...item.link}
+                        appearance="inline"
+                        className="block py-2 text-foreground font-medium"
+                      />
+                      {hasChildren && (
+                        <button
+                          className="p-2"
+                          onClick={() => toggleDropdown(openDropdown === i ? -1 : i)}
+                          aria-label={`Toggle ${item.link?.label} submenu`}
+                        >
+                          <ChevronDown
+                            className={cn(
+                              'w-4 h-4 transition-transform',
+                              openDropdown === i && 'rotate-180',
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+                    {hasChildren && openDropdown === i && (
+                      <div className="pl-4 space-y-1">
+                        {item.children!.map((child, j) => (
+                          <CMSLink
+                            key={j}
+                            {...child.link}
+                            appearance="inline"
+                            className="block py-2 text-sm text-muted-foreground hover:text-foreground"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+
+              {/* Mobile utility links */}
+              {utilityNav.length > 0 && (
+                <div className="pt-4 mt-4 border-t border-border space-y-1">
+                  {utilityNav.map(({ link }, i) => (
+                    <CMSLink
+                      key={i}
+                      {...link}
+                      appearance="inline"
+                      className="block py-2 text-sm text-muted-foreground"
+                    />
+                  ))}
+                </div>
+              )}
+
+              <Link href="/search" className="flex items-center gap-2 py-2 text-muted-foreground">
+                <SearchIcon className="w-4 h-4" />
+                <span>Search</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   )
