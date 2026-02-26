@@ -130,8 +130,8 @@ These collections feed the dynamic blocks (events-list, news-feed).
 ### Website-First Priority Sequence (Do This Before CRM / Member Portal)
 
 - [x] **WF.1** Build Phase 6 dynamic blocks (`events-list`, `news-feed`, `testimonials`, `sponsors-grid`) and register them
-- [ ] **WF.2** Build homepage composition target from Phase 12.1 using those blocks (OBOT-style section order)
-- [ ] **WF.3** Replace template/demo seed with Chamber-oriented placeholder content (hero, homepage sections, events/news/testimonials/sponsors)
+- [x] **WF.2** Build homepage composition target from Phase 12.1 using those blocks (OBOT-style section order)
+- [x] **WF.3** Replace template/demo seed with Chamber-oriented placeholder content (hero, homepage sections, events/news/testimonials/sponsors)
 - [ ] **WF.4** Frontend polish pass from Phase 12 (metadata, responsive QA, accessibility, performance baseline)
 - [ ] **WF.5** Only after WF.1–WF.4: resume admin CRM/member onboarding phases
 
@@ -291,8 +291,8 @@ Two tracks: easy third-party integration (Google Analytics et al.) and lightweig
 
 ## Phase 14: Seed Data & Launch Prep
 
-- [ ] **14.1** Create SGBCC seed script — populates site-settings (including analytics config), sample pages with blocks, sample events (including at least one from a template), sample news posts, sample team members, membership tiers, event templates
-- [ ] **14.2** Add SGBCC theme values to seed data (colors, fonts matching their brand)
+- [x] **14.1** Create SGBCC seed script — populates site-settings (including analytics config), sample pages with blocks, sample events (including at least one from a template), sample news posts, sample team members, membership tiers, event templates
+- [x] **14.2** Add SGBCC theme values to seed data (colors, fonts matching their brand)
 - [ ] **14.3** Production deployment checklist — PostgreSQL adapter swap, S3/R2 storage adapter, env vars, Stripe live keys, DNS
 - [ ] **14.4** Write deployment README for spinning up a new Chamber OS client instance
 

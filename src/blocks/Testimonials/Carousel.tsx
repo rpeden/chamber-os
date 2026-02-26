@@ -45,10 +45,7 @@ export function TestimonialsCarousel({ testimonials, autoAdvance }: Testimonials
     return () => clearInterval(timer)
   }, [autoAdvance, paused, count, next])
 
-  const testimonial = testimonials[current]
-  if (!testimonial) return null
-
-  const hasPhoto = testimonial.photo && typeof testimonial.photo === 'object'
+  if (!testimonials[0]) return null
 
   return (
     <div
@@ -56,40 +53,67 @@ export function TestimonialsCarousel({ testimonials, autoAdvance }: Testimonials
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start min-h-[250px]">
-        {/* Pullquote side */}
-        <div className="flex items-start">
-          <blockquote className="text-2xl md:text-3xl lg:text-4xl font-bold italic leading-snug text-theme-primary">
-            &ldquo;{testimonial.pullquote}&rdquo;
-          </blockquote>
-        </div>
+      {/*
+       * All slides are in the DOM at all times — only opacity changes.
+       * This means every image loads exactly once on mount; no re-requests
+       * as the carousel advances. Non-active slides are hidden from
+       * assistive tech via aria-hidden and removed from tab order via
+       * pointer-events-none.
+       */}
+      <div className="relative min-h-62.5">
+        {testimonials.map((testimonial, i) => {
+          const hasPhoto = testimonial.photo && typeof testimonial.photo === 'object'
+          const isActive = i === current
 
-        {/* Full quote + attribution side */}
-        <div className="flex flex-col">
-          {testimonial.fullQuote && (
-            <div className="mb-6 text-base leading-relaxed">
-              <RichText data={testimonial.fullQuote} enableGutter={false} />
-            </div>
-          )}
-
-          {/* Attribution */}
-          <div className="flex items-center gap-4 mt-auto">
-            {hasPhoto && (
-              <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
-                <Media
-                  resource={testimonial.photo as NonNullable<typeof testimonial.photo>}
-                  imgClassName="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <div>
-              <div className="font-semibold">{testimonial.attributionName}</div>
-              {testimonial.attributionOrg && (
-                <div className="text-sm text-muted-foreground">{testimonial.attributionOrg}</div>
+          return (
+            <div
+              key={i}
+              className={cn(
+                'grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start transition-opacity duration-500',
+                isActive
+                  ? 'opacity-100 relative'
+                  : 'opacity-0 absolute inset-0 pointer-events-none',
               )}
+              aria-hidden={!isActive}
+            >
+              {/* Pullquote side */}
+              <div className="flex items-start">
+                <blockquote className="text-2xl md:text-3xl lg:text-4xl font-bold italic leading-snug text-theme-primary">
+                  &ldquo;{testimonial.pullquote}&rdquo;
+                </blockquote>
+              </div>
+
+              {/* Full quote + attribution side */}
+              <div className="flex flex-col">
+                {testimonial.fullQuote && (
+                  <div className="mb-6 text-base leading-relaxed">
+                    <RichText data={testimonial.fullQuote} enableGutter={false} />
+                  </div>
+                )}
+
+                {/* Attribution */}
+                <div className="flex items-center gap-4 mt-auto">
+                  {hasPhoto && (
+                    <div className="w-14 h-14 rounded-full overflow-hidden shrink-0">
+                      <Media
+                        resource={testimonial.photo as NonNullable<typeof testimonial.photo>}
+                        imgClassName="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-semibold">{testimonial.attributionName}</div>
+                    {testimonial.attributionOrg && (
+                      <div className="text-sm text-muted-foreground">
+                        {testimonial.attributionOrg}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        })}
       </div>
 
       {/* Navigation */}

@@ -57,7 +57,7 @@ export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
 
         {/* Dark overlay — opacity controlled by the overlayOpacity field */}
         <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/30"
+          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/40"
           style={{ opacity }}
           aria-hidden="true"
         />
@@ -66,8 +66,12 @@ export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center md:py-20">
           {heading && (
             <h1
-              className="mb-4 max-w-4xl leading-tight tracking-tight drop-shadow-lg"
-              style={{ fontSize: '60px', fontWeight: 500 }}
+              className="mb-4 max-w-4xl leading-tight tracking-tight"
+              style={{
+                fontSize: '60px',
+                fontWeight: 500,
+                textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
+              }}
             >
               {heading}
             </h1>
@@ -75,8 +79,12 @@ export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
 
           {subheading && (
             <p
-              className="max-w-2xl text-white/90 drop-shadow-md"
-              style={{ fontSize: '30px', fontWeight: 400 }}
+              className="max-w-2xl text-white"
+              style={{
+                fontSize: '30px',
+                fontWeight: 400,
+                textShadow: '0 2px 10px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.4)',
+              }}
             >
               {subheading}
             </p>
@@ -88,7 +96,7 @@ export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
           <div className="relative z-10 px-4 pb-8 sm:px-8 md:px-12 lg:px-16">
             <div
               className={cn(
-                'grid grid-cols-1 gap-3 sm:gap-4',
+                'grid grid-cols-1 gap-4 sm:gap-6 mx-auto',
                 buttonCount === 2 && 'sm:grid-cols-2 max-w-3xl',
                 buttonCount >= 3 && 'sm:grid-cols-3 max-w-5xl',
               )}
