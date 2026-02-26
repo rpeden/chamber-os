@@ -5,7 +5,6 @@ import React from 'react'
 
 import type { Footer as FooterType } from '@/payload-types'
 
-import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 
@@ -37,7 +36,7 @@ export async function Footer() {
   const { siteName, email, phone, address, socialLinks } = siteSettings || {}
 
   return (
-    <footer className="mt-auto border-t border-border bg-theme-primary text-white">
+    <footer className="mt-auto bg-theme-primary text-white">
       <div className="container py-12">
         {/* ── Upper section: columns + contact ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -117,7 +116,7 @@ export async function Footer() {
         {/* ── Bottom bar ── */}
         <div className="mt-10 pt-6 border-t border-white/20 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/60">{copyrightText}</p>
-          <ThemeSelector />
+          {/* Theme selector hidden — revisit when multi-theme support lands */}
         </div>
       </div>
     </footer>

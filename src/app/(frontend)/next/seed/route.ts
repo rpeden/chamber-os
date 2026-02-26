@@ -3,7 +3,9 @@ import { seed } from '@/endpoints/seed'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 
-export const maxDuration = 60 // This function can run for a maximum of 60 seconds
+// Seeding uploads many large images and generates multiple responsive sizes,
+// which can exceed 60s in local/dev environments.
+export const maxDuration = 300
 
 export async function POST(): Promise<Response> {
   const payload = await getPayload({ config })
@@ -26,6 +28,12 @@ export async function POST(): Promise<Response> {
     return Response.json({ success: true })
   } catch (e) {
     payload.logger.error({ err: e, message: 'Error seeding data' })
+    const message = e instanceof Error ? e.message : 'Unknown error'
+
+    if (process.env.NODE_ENV !== 'production') {
+      return new Response(`Error seeding data: ${message}`, { status: 500 })
+    }
+
     return new Response('Error seeding data.', { status: 500 })
   }
 }

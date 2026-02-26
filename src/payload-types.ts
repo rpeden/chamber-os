@@ -69,6 +69,9 @@ export interface Config {
   collections: {
     pages: Page;
     posts: Post;
+    events: Event;
+    'event-templates': EventTemplate;
+    team: Team;
     media: Media;
     categories: Category;
     users: User;
@@ -91,6 +94,9 @@ export interface Config {
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'event-templates': EventTemplatesSelect<false> | EventTemplatesSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -200,7 +206,24 @@ export interface Page {
         }[]
       | null;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | TextColumnsBlock
+    | CardGridBlock
+    | IconGridBlock
+    | ImageTextBlock
+    | CtaBannerBlock
+    | StatsBarBlock
+    | MixedContentRowBlock
+    | EventsListBlock
+    | NewsFeedBlock
+    | TestimonialsBlock
+    | SponsorsGridBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -782,6 +805,722 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextColumnsBlock".
+ */
+export interface TextColumnsBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Controls the column layout. On mobile, all layouts stack to a single column.
+   */
+  layout: 'oneColumn' | 'twoEqual' | 'twoWideLeft' | 'twoWideRight' | 'threeEqual' | 'fourEqual';
+  /**
+   * Add up to 4 columns of rich text content
+   */
+  columns?:
+    | {
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textColumns';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardGridBlock".
+ */
+export interface CardGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Number of columns on desktop. Stacks to fewer columns on smaller screens.
+   */
+  columns: '2' | '3' | '4';
+  /**
+   * Add cards to the grid
+   */
+  cards?:
+    | {
+        /**
+         * Card image — displayed at the top of the card
+         */
+        image?: (number | null) | Media;
+        heading: string;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cardGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconGridBlock".
+ */
+export interface IconGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  columns: '2' | '3' | '4';
+  items?:
+    | {
+        /**
+         * Icon image — SVG recommended, displayed at 48×48px
+         */
+        icon: number | Media;
+        /**
+         * Small text above the heading (e.g., "Step 1", "Networking")
+         */
+        overline?: string | null;
+        heading: string;
+        /**
+         * Short description — plain text, not rich text
+         */
+        body?: string | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iconGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  layout: 'imageLeft' | 'imageRight';
+  image: number | Media;
+  heading?: string | null;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  enableCta?: boolean | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline') | null;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock".
+ */
+export interface CtaBannerBlock {
+  heading: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  link: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline') | null;
+  };
+  /**
+   * Visual style of the CTA button
+   */
+  ctaVariant?: ('primary' | 'secondary' | 'accent' | 'outline') | null;
+  /**
+   * Optional background image — will display with a dark overlay for text readability
+   */
+  backgroundImage?: (number | null) | Media;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBanner';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBarBlock".
+ */
+export interface StatsBarBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add 2–6 statistics to display in a row
+   */
+  stats?:
+    | {
+        /**
+         * The stat value — e.g., "500+", "$2M", "25 Years"
+         */
+        number: string;
+        /**
+         * Label below the number — e.g., "Active Members", "Raised Annually"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsBar';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MixedContentRowBlock".
+ */
+export interface MixedContentRowBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Vertical alignment of slot contents when heights differ
+   */
+  verticalAlignment?: ('top' | 'center' | 'bottom') | null;
+  /**
+   * Add 1–4 content slots. Column widths should add up to a sensible total.
+   */
+  slots?:
+    | {
+        width: 'quarter' | 'third' | 'half' | 'twoThirds' | 'threeQuarters' | 'full';
+        contentType: 'richText' | 'image' | 'cta';
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        image?: (number | null) | Media;
+        ctaHeading?: string | null;
+        ctaBody?: string | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mixedContentRow';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsListBlock".
+ */
+export interface EventsListBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Optional short paragraph below the heading
+   */
+  introText?: string | null;
+  /**
+   * Featured: only events marked as featured. Upcoming: future events by date. All: everything published.
+   */
+  displayMode: 'featured' | 'upcoming' | 'all';
+  /**
+   * Maximum number of events to display (1–12)
+   */
+  maxItems?: number | null;
+  enableViewAllLink?: boolean | null;
+  /**
+   * Link to the full events listing page
+   */
+  viewAllLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'eventsList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsFeedBlock".
+ */
+export interface NewsFeedBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Optional short paragraph below the heading
+   */
+  introText?: string | null;
+  /**
+   * Maximum number of posts to display (1–12)
+   */
+  maxItems?: number | null;
+  /**
+   * Optional: only show posts from these categories. Leave empty to show all categories.
+   */
+  categoryFilter?: (number | Category)[] | null;
+  enableViewAllLink?: boolean | null;
+  /**
+   * Link to the full news/blog listing page
+   */
+  viewAllLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'newsFeed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock".
+ */
+export interface TestimonialsBlock {
+  /**
+   * Optional heading above the testimonials carousel
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add testimonials — each one appears as a slide in the carousel
+   */
+  testimonials?:
+    | {
+        /**
+         * A short, punchy excerpt displayed large — the "headline" of the testimonial
+         */
+        pullquote: string;
+        /**
+         * The complete testimonial text
+         */
+        fullQuote: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Name of the person giving the testimonial
+         */
+        attributionName: string;
+        /**
+         * Organization, title, or role — e.g., "Owner, Hudson Bay Trading Post"
+         */
+        attributionOrg?: string | null;
+        /**
+         * Optional headshot photo
+         */
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Automatically cycle through testimonials every 8 seconds
+   */
+  autoAdvance?: boolean | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SponsorsGridBlock".
+ */
+export interface SponsorsGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add sponsor tiers — e.g., "Pillar Partners", "Gold Sponsors"
+   */
+  tiers?:
+    | {
+        /**
+         * Heading shown above this row of logos
+         */
+        tierName: string;
+        /**
+         * Grid shows all logos at once. Carousel lets you scroll through them with arrows.
+         */
+        displayMode: 'grid' | 'carousel';
+        /**
+         * Add sponsor logos with optional links to their websites
+         */
+        logos?:
+          | {
+              logo: number | Media;
+              /**
+               * Used for alt text and hover tooltip
+               */
+              sponsorName?: string | null;
+              /**
+               * Link to the sponsor's website (opens in new tab)
+               */
+              url?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'sponsorsGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Optional: choose a template to prefill ticketing, location, and other defaults on create.
+   */
+  eventTemplate?: (number | null) | EventTemplate;
+  location: string;
+  startDate: string;
+  endDate: string;
+  featuredImage?: (number | null) | Media;
+  isFeatured?: boolean | null;
+  isChambersEvent?: boolean | null;
+  status: 'draft' | 'published' | 'cancelled';
+  ticketingType: 'none' | 'external-link' | 'chamber-managed';
+  /**
+   * Use when ticket sales are handled on another platform.
+   */
+  externalTicketUrl?: string | null;
+  ticketTypes?:
+    | {
+        name: string;
+        description?: string | null;
+        priceCents: number;
+        capacity: number;
+        saleStart?: string | null;
+        saleEnd?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  serviceFee?: {
+    feeType: 'none' | 'flat' | 'percentage';
+    feeAmount?: number | null;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-templates".
+ */
+export interface EventTemplate {
+  id: number;
+  seriesName: string;
+  defaultDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  defaultFeaturedImage?: (number | null) | Media;
+  defaultLocation?: string | null;
+  defaultTicketingType: 'none' | 'external-link' | 'chamber-managed';
+  defaultExternalTicketUrl?: string | null;
+  defaultTicketTypes?:
+    | {
+        name: string;
+        description?: string | null;
+        priceCents: number;
+        capacity: number;
+        saleStart?: string | null;
+        saleEnd?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  defaultServiceFee?: {
+    feeType: 'none' | 'flat' | 'percentage';
+    feeAmount?: number | null;
+  };
+  defaultIsChambersEvent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  title: string;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  headshot?: (number | null) | Media;
+  type: 'staff' | 'board';
+  displayOrder: number;
+  email?: string | null;
+  linkedin?: string | null;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -979,6 +1718,18 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'event-templates';
+        value: number | EventTemplate;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1090,6 +1841,17 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        textColumns?: T | TextColumnsBlockSelect<T>;
+        cardGrid?: T | CardGridBlockSelect<T>;
+        iconGrid?: T | IconGridBlockSelect<T>;
+        imageText?: T | ImageTextBlockSelect<T>;
+        ctaBanner?: T | CtaBannerBlockSelect<T>;
+        statsBar?: T | StatsBarBlockSelect<T>;
+        mixedContentRow?: T | MixedContentRowBlockSelect<T>;
+        eventsList?: T | EventsListBlockSelect<T>;
+        newsFeed?: T | NewsFeedBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        sponsorsGrid?: T | SponsorsGridBlockSelect<T>;
       };
   meta?:
     | T
@@ -1191,6 +1953,270 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextColumnsBlock_select".
+ */
+export interface TextColumnsBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  layout?: T;
+  columns?:
+    | T
+    | {
+        richText?: T;
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardGridBlock_select".
+ */
+export interface CardGridBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        image?: T;
+        heading?: T;
+        body?: T;
+        enableLink?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconGridBlock_select".
+ */
+export interface IconGridBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  columns?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        overline?: T;
+        heading?: T;
+        body?: T;
+        enableLink?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock_select".
+ */
+export interface ImageTextBlockSelect<T extends boolean = true> {
+  layout?: T;
+  image?: T;
+  heading?: T;
+  body?: T;
+  enableCta?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBannerBlock_select".
+ */
+export interface CtaBannerBlockSelect<T extends boolean = true> {
+  heading?: T;
+  body?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
+      };
+  ctaVariant?: T;
+  backgroundImage?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBarBlock_select".
+ */
+export interface StatsBarBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  stats?:
+    | T
+    | {
+        number?: T;
+        label?: T;
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MixedContentRowBlock_select".
+ */
+export interface MixedContentRowBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  verticalAlignment?: T;
+  slots?:
+    | T
+    | {
+        width?: T;
+        contentType?: T;
+        richText?: T;
+        image?: T;
+        ctaHeading?: T;
+        ctaBody?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsListBlock_select".
+ */
+export interface EventsListBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  introText?: T;
+  displayMode?: T;
+  maxItems?: T;
+  enableViewAllLink?: T;
+  viewAllLink?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsFeedBlock_select".
+ */
+export interface NewsFeedBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  introText?: T;
+  maxItems?: T;
+  categoryFilter?: T;
+  enableViewAllLink?: T;
+  viewAllLink?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock_select".
+ */
+export interface TestimonialsBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  testimonials?:
+    | T
+    | {
+        pullquote?: T;
+        fullQuote?: T;
+        attributionName?: T;
+        attributionOrg?: T;
+        photo?: T;
+        id?: T;
+      };
+  autoAdvance?: T;
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SponsorsGridBlock_select".
+ */
+export interface SponsorsGridBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  tiers?:
+    | T
+    | {
+        tierName?: T;
+        displayMode?: T;
+        logos?:
+          | T
+          | {
+              logo?: T;
+              sponsorName?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -1219,6 +2245,94 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  eventTemplate?: T;
+  location?: T;
+  startDate?: T;
+  endDate?: T;
+  featuredImage?: T;
+  isFeatured?: T;
+  isChambersEvent?: T;
+  status?: T;
+  ticketingType?: T;
+  externalTicketUrl?: T;
+  ticketTypes?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        priceCents?: T;
+        capacity?: T;
+        saleStart?: T;
+        saleEnd?: T;
+        id?: T;
+      };
+  serviceFee?:
+    | T
+    | {
+        feeType?: T;
+        feeAmount?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-templates_select".
+ */
+export interface EventTemplatesSelect<T extends boolean = true> {
+  seriesName?: T;
+  defaultDescription?: T;
+  defaultFeaturedImage?: T;
+  defaultLocation?: T;
+  defaultTicketingType?: T;
+  defaultExternalTicketUrl?: T;
+  defaultTicketTypes?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        priceCents?: T;
+        capacity?: T;
+        saleStart?: T;
+        saleEnd?: T;
+        id?: T;
+      };
+  defaultServiceFee?:
+    | T
+    | {
+        feeType?: T;
+        feeAmount?: T;
+      };
+  defaultIsChambersEvent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  title?: T;
+  bio?: T;
+  headshot?: T;
+  type?: T;
+  displayOrder?: T;
+  email?: T;
+  linkedin?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1844,7 +2958,7 @@ export interface SiteSetting {
     | "'Inter', sans-serif"
     | "'Lora', serif"
     | "'Merriweather', serif"
-    | "'Montserrat', sans-serif"
+    | "var(--font-montserrat), 'Montserrat', sans-serif"
     | "'Open Sans', sans-serif"
     | "'Playfair Display', serif"
     | "'Raleway', sans-serif"
@@ -1858,7 +2972,7 @@ export interface SiteSetting {
     | "'Inter', sans-serif"
     | "'Lora', serif"
     | "'Merriweather', serif"
-    | "'Montserrat', sans-serif"
+    | "var(--font-montserrat), 'Montserrat', sans-serif"
     | "'Open Sans', sans-serif"
     | "'Playfair Display', serif"
     | "'Raleway', sans-serif"

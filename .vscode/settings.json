@@ -36,5 +36,16 @@
     "editor.codeActionsOnSave": {
       "source.fixAll.eslint": "explicit"
     }
+  },
+  "chat.tools.terminal.autoApprove": {
+    "/^source ~/\\.bashrc && cd /Users/ryanpeden/projects/sgbcc-website/sgbcc-website && pnpm generate:types$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "pnpm": true,
+    "/^source ~/\\.bashrc && cd /Users/ryanpeden/projects/sgbcc-website/sgbcc-website && pnpm tsc --noEmit$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }

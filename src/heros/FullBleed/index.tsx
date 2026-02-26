@@ -1,102 +1,115 @@
 import React from 'react'
+import { ArrowRight } from 'lucide-react'
 
 import type { Page } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { CMSLink } from '@/components/Link'
 import { cn } from '@/utilities/ui'
-import { SetHeaderTheme } from '@/heros/SetHeaderTheme'
 
 type FullBleedHeroProps = Page['hero']
 
 /**
- * Full-bleed hero with background image, gradient overlay, and CTA buttons.
+ * Contained hero with background image, dark overlay, and OBOT-style
+ * floating CTA cards near the bottom.
  *
- * Uses the `--header-height` CSS variable (set by the Header client component
- * via ResizeObserver) to pull itself up behind the header with a negative
- * margin. No magic numbers. If the header changes height — due to responsive
- * breakpoints, different nav items, whatever — the hero adapts automatically.
+ * Inspired by the Ottawa Board of Trade: the hero sits inside the page
+ * with horizontal margins (like OBOT) but NO rounded corners — just
+ * straight edges meeting the page gutters. CTA buttons are semi-transparent
+ * colored cards that float near the bottom of the hero with text
+ * left-aligned and an arrow icon on the right.
  *
- * The gradient overlay uses the `overlayOpacity` field (0-100) to control
- * how dark the overlay gets. Default is 50, which is readable without
- * making the background image irrelevant.
+ * The `overlayOpacity` field (0-100) controls how dark the overlay gets.
+ * Higher values = more readable white text on busy images. Default 60.
  */
 export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
   heading,
   subheading,
   media,
-  overlayOpacity = 50,
+  overlayOpacity = 60,
   ctaButtons,
 }) => {
   // Convert 0-100 to 0-1 for CSS opacity
-  const opacity = (overlayOpacity ?? 50) / 100
+  const opacity = (overlayOpacity ?? 60) / 100
 
-  /** Map CTA variant slugs to Tailwind classes */
+  /** Map CTA variant slugs to semi-transparent background colors */
   const variantClasses: Record<string, string> = {
-    primary:
-      'bg-[var(--theme-primary)] hover:bg-[var(--theme-primary)]/90 text-white border-transparent',
-    secondary:
-      'bg-[var(--theme-secondary)] hover:bg-[var(--theme-secondary)]/90 text-white border-transparent',
-    accent:
-      'bg-[var(--theme-accent)] hover:bg-[var(--theme-accent)]/90 text-white border-transparent',
-    outline: 'bg-transparent hover:bg-white/10 text-white border-white/80 hover:border-white',
+    primary: 'bg-[var(--theme-primary)]/85 hover:bg-[var(--theme-primary)]/95',
+    secondary: 'bg-[var(--theme-secondary)]/85 hover:bg-[var(--theme-secondary)]/95',
+    accent: 'bg-[var(--theme-accent)]/85 hover:bg-[var(--theme-accent)]/95',
+    outline: 'bg-white/20 hover:bg-white/30',
   }
 
+  const buttonCount = Array.isArray(ctaButtons) ? ctaButtons.length : 0
+
   return (
-    <div
-      className="relative flex min-h-[85vh] items-center justify-center text-white"
-      style={{ marginTop: 'calc(-1 * var(--header-height, 6rem))' }}
-      data-theme="dark"
-    >
-      <SetHeaderTheme theme="dark" />
-
-      {/* Background image */}
-      <div className="absolute inset-0 -z-20 select-none">
-        {media && typeof media === 'object' && (
-          <Media fill imgClassName="object-cover" priority resource={media} />
-        )}
-      </div>
-
-      {/* Gradient overlay */}
+    <section className="px-3 pt-2 pb-2 sm:px-4 sm:pt-3 sm:pb-3 md:px-6 md:pt-4 md:pb-4 lg:px-8 lg:pt-5 lg:pb-5">
       <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/60 to-black/30"
-        style={{ opacity }}
-        aria-hidden="true"
-      />
-
-      {/* Content */}
-      <div
-        className="container relative z-10 flex flex-col items-center text-center"
-        style={{ paddingTop: 'var(--header-height, 6rem)' }}
+        className="relative flex min-h-[75vh] flex-col overflow-hidden text-white"
+        data-theme="dark"
       >
-        {heading && (
-          <h1 className="mb-4 max-w-4xl text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl drop-shadow-lg">
-            {heading}
-          </h1>
-        )}
+        {/* Background image */}
+        <div className="absolute inset-0 -z-20 select-none">
+          {media && typeof media === 'object' && (
+            <Media fill imgClassName="object-cover" priority resource={media} />
+          )}
+        </div>
 
-        {subheading && (
-          <p className="mb-8 max-w-2xl text-lg text-white/90 md:text-xl drop-shadow-md">
-            {subheading}
-          </p>
-        )}
+        {/* Dark overlay — opacity controlled by the overlayOpacity field */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/30"
+          style={{ opacity }}
+          aria-hidden="true"
+        />
 
-        {Array.isArray(ctaButtons) && ctaButtons.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-4">
-            {ctaButtons.map(({ link, variant = 'primary' }, i) => (
-              <CMSLink
-                key={i}
-                {...link}
-                appearance="inline"
-                className={cn(
-                  'inline-flex items-center justify-center rounded-md border-2 px-6 py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-200 shadow-lg hover:shadow-xl',
-                  variantClasses[variant] ?? variantClasses.primary,
-                )}
-              />
-            ))}
+        {/* Content — flex-1 pushes CTAs toward bottom */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center md:py-20">
+          {heading && (
+            <h1
+              className="mb-4 max-w-4xl leading-tight tracking-tight drop-shadow-lg"
+              style={{ fontSize: '60px', fontWeight: 500 }}
+            >
+              {heading}
+            </h1>
+          )}
+
+          {subheading && (
+            <p
+              className="max-w-2xl text-white/90 drop-shadow-md"
+              style={{ fontSize: '30px', fontWeight: 400 }}
+            >
+              {subheading}
+            </p>
+          )}
+        </div>
+
+        {/* CTA Cards — OBOT-style floating, semi-transparent, near bottom */}
+        {buttonCount > 0 && (
+          <div className="relative z-10 px-4 pb-8 sm:px-8 md:px-12 lg:px-16">
+            <div
+              className={cn(
+                'grid grid-cols-1 gap-3 sm:gap-4',
+                buttonCount === 2 && 'sm:grid-cols-2 max-w-3xl',
+                buttonCount >= 3 && 'sm:grid-cols-3 max-w-5xl',
+              )}
+            >
+              {ctaButtons!.map(({ link, variant = 'primary' }, i) => (
+                <CMSLink
+                  key={i}
+                  {...link}
+                  appearance="inline"
+                  className={cn(
+                    'group flex items-center justify-between px-6 py-5 text-sm font-bold uppercase tracking-widest text-white transition-all duration-200',
+                    variantClasses[variant] ?? variantClasses.primary,
+                  )}
+                >
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </CMSLink>
+              ))}
+            </div>
           </div>
         )}
       </div>
-    </div>
+    </section>
   )
 }

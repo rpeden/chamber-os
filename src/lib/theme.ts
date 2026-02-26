@@ -13,7 +13,7 @@ export const FONT_OPTIONS = [
   { label: 'Inter', value: "'Inter', sans-serif" },
   { label: 'Lora', value: "'Lora', serif" },
   { label: 'Merriweather', value: "'Merriweather', serif" },
-  { label: 'Montserrat', value: "'Montserrat', sans-serif" },
+  { label: 'Montserrat', value: "var(--font-montserrat), 'Montserrat', sans-serif" },
   { label: 'Open Sans', value: "'Open Sans', sans-serif" },
   { label: 'Playfair Display', value: "'Playfair Display', serif" },
   { label: 'Raleway', value: "'Raleway', sans-serif" },
@@ -22,11 +22,11 @@ export const FONT_OPTIONS = [
 
 /** Default theme values — used when site-settings hasn't been configured yet */
 export const DEFAULT_THEME = {
-  primaryColor: '#1e3a5f',
-  secondaryColor: '#2d5f8a',
-  accentColor: '#e8a317',
-  headingFont: 'system-ui, -apple-system, sans-serif',
-  bodyFont: 'system-ui, -apple-system, sans-serif',
+  primaryColor: '#1a3550',
+  secondaryColor: '#2d5a3e',
+  accentColor: '#d4a843',
+  headingFont: "var(--font-montserrat), 'Montserrat', sans-serif",
+  bodyFont: "var(--font-montserrat), 'Montserrat', sans-serif",
 } as const
 
 export type ThemeSettings = {

@@ -8,12 +8,12 @@ This is the work plan to get from the current Payload website template to a func
 
 The existing template has scaffolding that either needs to be repurposed or removed so it doesn't confuse the real work.
 
-- [ ] **0.1** Audit existing blocks (Content, CallToAction, MediaBlock, Archive, FormBlock) — decide which to keep, modify, or replace with Chamber OS equivalents
-- [ ] **0.2** Audit existing hero system (highImpact, mediumImpact, lowImpact) — rework to support OBOT-style hero (background image + centered text + 1–3 colored CTAs)
-- [ ] **0.3** Set up `src/lib/` directory structure: `lib/features.ts`, `lib/theme.ts`, `lib/stripe/` (empty for now)
-- [ ] **0.4** Add `zod` for env validation — create `lib/env.ts` with typed env vars
-- [ ] **0.5** Configure Tailwind theme extension for CSS custom properties (`var(--color-primary)`, etc.)
-- [ ] **0.6** Remove or repurpose the `BeforeLogin` and `BeforeDashboard` placeholder components
+- [x] **0.1** Audit existing blocks (Content, CallToAction, MediaBlock, Archive, FormBlock) — decide which to keep, modify, or replace with Chamber OS equivalents
+- [x] **0.2** Audit existing hero system (highImpact, mediumImpact, lowImpact) — rework to support OBOT-style hero (background image + centered text + 1–3 colored CTAs)
+- [x] **0.3** Set up `src/lib/` directory structure: `lib/features.ts`, `lib/theme.ts`, `lib/stripe/` (empty for now)
+- [x] **0.4** Add `zod` for env validation — create `lib/env.ts` with typed env vars
+- [x] **0.5** Configure Tailwind theme extension for CSS custom properties (`var(--color-primary)`, etc.)
+- [x] **0.6** Remove or repurpose the `BeforeLogin` and `BeforeDashboard` placeholder components
 
 ---
 
@@ -21,13 +21,13 @@ The existing template has scaffolding that either needs to be repurposed or remo
 
 Everything downstream depends on the theme system being in place.
 
-- [ ] **1.1** Create `site-settings` global — fields: site name, logo (upload), tagline, contact info (address, phone, email), social links (array of platform + URL)
-- [ ] **1.2** Add theme group to `site-settings` — fields: primary color, secondary color, accent color, heading font (select from curated list), body font (select from curated list), section spacing
-- [ ] **1.3** Build theme injection — server component that reads `site-settings` global and outputs a `<style>` tag with CSS custom properties into the `<head>`
-- [ ] **1.4** Update `globals.css` / Tailwind config to reference CSS custom properties for all theme-able values (colors, fonts, spacing)
-- [ ] **1.5** Create shared block wrapper component — handles section spacing, background variants (`light-bg`, `dark-bg`, `brand-bg`), max-width container
-- [ ] **1.6** Register `site-settings` global in `payload.config.ts`
-- [ ] **1.7** Generate types (`pnpm generate:types`) and validate with `tsc --noEmit`
+- [x] **1.1** Create `site-settings` global — fields: site name, logo (upload), tagline, contact info (address, phone, email), social links (array of platform + URL)
+- [x] **1.2** Add theme group to `site-settings` — fields: primary color, secondary color, accent color, heading font (select from curated list), body font (select from curated list), section spacing
+- [x] **1.3** Build theme injection — server component that reads `site-settings` global and outputs a `<style>` tag with CSS custom properties into the `<head>`
+- [x] **1.4** Update `globals.css` / Tailwind config to reference CSS custom properties for all theme-able values (colors, fonts, spacing)
+- [x] **1.5** Create shared block wrapper component — handles section spacing, background variants (`light-bg`, `dark-bg`, `brand-bg`), max-width container
+- [x] **1.6** Register `site-settings` global in `payload.config.ts`
+- [x] **1.7** Generate types (`pnpm generate:types`) and validate with `tsc --noEmit`
 
 ---
 
@@ -35,11 +35,11 @@ Everything downstream depends on the theme system being in place.
 
 The current header/footer globals are flat link arrays. Chamber sites need dropdown menus and structured footers.
 
-- [ ] **2.1** Enhance Header global — support nested nav items (top-level link + optional dropdown array of child links), optional "utility nav" row (e.g., "Be a Member", "Member Login", "Contact" + social icons)
-- [ ] **2.2** Build responsive Header component — desktop: two-row nav (utility + main with dropdowns); mobile: hamburger with slide-out or accordion
-- [ ] **2.3** Enhance Footer global — support footer columns (array of column title + links), copyright text, social links (pulled from `site-settings`)
-- [ ] **2.4** Build Footer component — multi-column layout, responsive stacking
-- [ ] **2.5** Generate types and validate
+- [x] **2.1** Enhance Header global — support nested nav items (top-level link + optional dropdown array of child links), optional "utility nav" row (e.g., "Be a Member", "Member Login", "Contact" + social icons)
+- [x] **2.2** Build responsive Header component — desktop: two-row nav (utility + main with dropdowns); mobile: hamburger with slide-out or accordion
+- [x] **2.3** Enhance Footer global — support footer columns (array of column title + links), copyright text, social links (pulled from `site-settings`)
+- [x] **2.4** Build Footer component — multi-column layout, responsive stacking
+- [x] **2.5** Generate types and validate
 
 ---
 
@@ -47,10 +47,10 @@ The current header/footer globals are flat link arrays. Chamber sites need dropd
 
 The current hero has 3 variants (high/medium/low impact). Rework to match the OBOT pattern while keeping it flexible.
 
-- [ ] **3.1** Redesign hero field schema — background image (required), overlay opacity (number, default 0.4), heading (text), subheading (text), CTA buttons (array of 1–3, each with label + link + color variant: primary/secondary/accent)
-- [ ] **3.2** Build hero render component — full-bleed image, dark gradient overlay, centered text, row of colored CTA buttons at bottom, responsive text sizing
-- [ ] **3.3** Ensure hero works with the block wrapper's spacing system
-- [ ] **3.4** Test with sample content matching the OBOT hero layout
+- [x] **3.1** Redesign hero field schema — background image (required), overlay opacity (number, default 0.4), heading (text), subheading (text), CTA buttons (array of 1–3, each with label + link + color variant: primary/secondary/accent)
+- [x] **3.2** Build hero render component — full-bleed image, dark gradient overlay, centered text, row of colored CTA buttons at bottom, responsive text sizing
+- [x] **3.3** Ensure hero works with the block wrapper's spacing system
+- [x] **3.4** Test with sample content matching the OBOT hero layout
 
 ---
 
@@ -59,37 +59,37 @@ The current hero has 3 variants (high/medium/low impact). Rework to match the OB
 These are the building blocks staff will use on nearly every page.
 
 ### `text-columns`
-- [ ] **4.1** Define Payload schema — layout preset (select), array of columns (rich text each), section heading (optional), background variant
-- [ ] **4.2** Build render component — CSS Grid with responsive breakpoints, columns stack on mobile
+- [x] **4.1** Define Payload schema — layout preset (select), array of columns (rich text each), section heading (optional), background variant
+- [x] **4.2** Build render component — CSS Grid with responsive breakpoints, columns stack on mobile
 
 ### `card-grid`
-- [ ] **4.3** Define Payload schema — columns (select: 2/3/4), cards (array of: image upload + heading + body rich text + optional link), section heading (optional), background variant
-- [ ] **4.4** Build render component — CSS Grid, equal-height cards, responsive collapse (4→2→1)
+- [x] **4.3** Define Payload schema — columns (select: 2/3/4), cards (array of: image upload + heading + body rich text + optional link), section heading (optional), background variant
+- [x] **4.4** Build render component — CSS Grid, equal-height cards, responsive collapse (4→2→1)
 
 ### `icon-grid`
-- [ ] **4.5** Define Payload schema — items (array of 2–4: icon upload + overline text + heading + body text + optional link), columns (select: 2/4), background variant
-- [ ] **4.6** Build render component — grid layout with icon circle/container, overline + heading stack
+- [x] **4.5** Define Payload schema — items (array of 2–4: icon upload + overline text + heading + body text + optional link), columns (select: 2/4), background variant
+- [x] **4.6** Build render component — grid layout with icon circle/container, overline + heading stack
 
 ### `image-text`
-- [ ] **4.7** Define Payload schema — image (upload), heading, body (rich text), CTA (link + label), layout variant (`image-left` / `image-right`), background variant
-- [ ] **4.8** Build render component — two-column flex/grid, image takes ~50% width, reverse order for `image-right` variant, stacks on mobile
+- [x] **4.7** Define Payload schema — image (upload), heading, body (rich text), CTA (link + label), layout variant (`image-left` / `image-right`), background variant
+- [x] **4.8** Build render component — two-column flex/grid, image takes ~50% width, reverse order for `image-right` variant, stacks on mobile
 
 ### `cta-banner`
-- [ ] **4.9** Define Payload schema — heading, body (rich text), CTA (link + label + color variant), background variant (`brand-bg` / `dark-bg` / `image-bg` with optional upload)
-- [ ] **4.10** Build render component — full-width section, centered text, prominent button
+- [x] **4.9** Define Payload schema — heading, body (rich text), CTA (link + label + color variant), background variant (`brand-bg` / `dark-bg` / `image-bg` with optional upload)
+- [x] **4.10** Build render component — full-width section, centered text, prominent button
 
 ### `stats-bar`
-- [ ] **4.11** Define Payload schema — stats (array of: number text + label text), background variant, optional section heading
-- [ ] **4.12** Build render component — horizontal row of stats with large numbers, responsive wrap
+- [x] **4.11** Define Payload schema — stats (array of: number text + label text), background variant, optional section heading
+- [x] **4.12** Build render component — horizontal row of stats with large numbers, responsive wrap
 
 ### `mixed-content-row`
-- [ ] **4.13** Define Payload schema — slots (array of 1–4: width select + content type select + content fields per type)
-- [ ] **4.14** Build render component — CSS Grid with column widths, responsive stacking
+- [x] **4.13** Define Payload schema — slots (array of 1–4: width select + content type select + content fields per type)
+- [x] **4.14** Build render component — CSS Grid with column widths, responsive stacking
 
 ### Block registration
-- [ ] **4.15** Register all new blocks in the Pages collection config
-- [ ] **4.16** Update `RenderBlocks.tsx` with new block components
-- [ ] **4.17** Generate types and validate
+- [x] **4.15** Register all new blocks in the Pages collection config
+- [x] **4.16** Update `RenderBlocks.tsx` with new block components
+- [x] **4.17** Generate types and validate
 
 ---
 
@@ -98,57 +98,65 @@ These are the building blocks staff will use on nearly every page.
 These collections feed the dynamic blocks (events-list, news-feed).
 
 ### Events
-- [ ] **5.1** Create Events collection — title, slug, description (rich text), location (text), startDate, endDate, featured image, `isFeatured` (boolean), `isChambersEvent` (boolean)
-- [ ] **5.2** Add ticketing fields — ticketing type select (`none`/`external-link`/`chamber-managed`), conditional fields: externalTicketUrl, ticket-types array (name, description, price in cents, capacity, saleStart, saleEnd), serviceFee group (feeType, feeAmount)
-- [ ] **5.3** Add status field (draft/published/cancelled) with appropriate access control
-- [ ] **5.4** Add event detail page route — `app/(frontend)/events/[slug]/page.tsx` with `generateMetadata`
-- [ ] **5.5** Add events index page — `app/(frontend)/events/page.tsx` with filtering (upcoming, past, Chamber events)
+- [x] **5.1** Create Events collection — title, slug, description (rich text), location (text), startDate, endDate, featured image, `isFeatured` (boolean), `isChambersEvent` (boolean)
+- [x] **5.2** Add ticketing fields — ticketing type select (`none`/`external-link`/`chamber-managed`), conditional fields: externalTicketUrl, ticket-types array (name, description, price in cents, capacity, saleStart, saleEnd), serviceFee group (feeType, feeAmount)
+- [x] **5.3** Add status field (draft/published/cancelled) with appropriate access control
+- [x] **5.4** Add event detail page route — `app/(frontend)/events/[slug]/page.tsx` with `generateMetadata`
+- [x] **5.5** Add events index page — `app/(frontend)/events/page.tsx` with filtering (upcoming, past, Chamber events)
 
 ### Event Templates
-- [ ] **5.6** Create Event Templates collection — series name, default description (rich text), default featured image, default location, default ticketing config (ticketing type, ticket-types array, service fee), default `isChambersEvent`
-- [ ] **5.7** Add `eventTemplate` relationship field to Events collection (optional) — when selected, auto-populates event fields from template defaults
-- [ ] **5.8** Build "New from Template" workflow — custom admin UI button or `beforeChange` hook that copies template defaults into a new event, allowing staff to override any field per instance
-- [ ] **5.9** Access control on Event Templates — authenticated create/update/delete, restrict to admin/staff roles
+- [x] **5.6** Create Event Templates collection — series name, default description (rich text), default featured image, default location, default ticketing config (ticketing type, ticket-types array, service fee), default `isChambersEvent`
+- [x] **5.7** Add `eventTemplate` relationship field to Events collection (optional) — when selected, auto-populates event fields from template defaults
+- [x] **5.8** Build "New from Template" workflow — custom admin UI button or `beforeChange` hook that copies template defaults into a new event, allowing staff to override any field per instance
+- [x] **5.9** Access control on Event Templates — authenticated create/update/delete, restrict to admin/staff roles
 
 ### News (repurpose Posts)
-- [ ] **5.10** Evaluate whether to repurpose the existing Posts collection as News or create a new one — Posts already has slug, content, SEO, categories, versioning
-- [ ] **5.11** Add any missing News-specific fields (featured image prominence, excerpt, etc.) or rename the collection
-- [ ] **5.12** Ensure news detail page route exists with `generateMetadata`
-- [ ] **5.13** Ensure news index page exists with category filtering
+- [x] **5.10** Evaluate whether to repurpose the existing Posts collection as News or create a new one — Posts already has slug, content, SEO, categories, versioning
+- [x] **5.11** Add any missing News-specific fields (featured image prominence, excerpt, etc.) or rename the collection
+- [x] **5.12** Ensure news detail page route exists with `generateMetadata`
+- [x] **5.13** Ensure news index page exists with category filtering
 
 ### Team
-- [ ] **5.14** Create Team collection — name, title, bio (rich text), headshot (upload), type (staff/board), display order (number), email (optional), LinkedIn (optional)
-- [ ] **5.15** Add access control (authenticated create/update/delete, public read for published)
+- [x] **5.14** Create Team collection — name, title, bio (rich text), headshot (upload), type (staff/board), display order (number), email (optional), LinkedIn (optional)
+- [x] **5.15** Add access control (authenticated create/update/delete, public read for published)
 
 ### Generate & validate
-- [ ] **5.16** Generate types and validate
+- [x] **5.16** Generate types and validate
 
 ---
 
 ## Phase 6: Dynamic Blocks
 
+### Website-First Priority Sequence (Do This Before CRM / Member Portal)
+
+- [x] **WF.1** Build Phase 6 dynamic blocks (`events-list`, `news-feed`, `testimonials`, `sponsors-grid`) and register them
+- [ ] **WF.2** Build homepage composition target from Phase 12.1 using those blocks (OBOT-style section order)
+- [ ] **WF.3** Replace template/demo seed with Chamber-oriented placeholder content (hero, homepage sections, events/news/testimonials/sponsors)
+- [ ] **WF.4** Frontend polish pass from Phase 12 (metadata, responsive QA, accessibility, performance baseline)
+- [ ] **WF.5** Only after WF.1–WF.4: resume admin CRM/member onboarding phases
+
 These blocks pull from the collections defined in Phase 5.
 
 ### `events-list`
-- [ ] **6.1** Define Payload schema — display mode (select: `featured` / `upcoming` / `all`), max items (number), section heading, "View All" CTA link, background variant
-- [ ] **6.2** Build render component — queries Events collection, renders cards with background image, date badge, title overlay, arrow link; responsive
+- [x] **6.1** Define Payload schema — display mode (select: `featured` / `upcoming` / `all`), max items (number), section heading, "View All" CTA link, background variant
+- [x] **6.2** Build render component — queries Events collection, renders cards with background image, date badge, title overlay, arrow link; responsive
 
 ### `news-feed`
-- [ ] **6.3** Define Payload schema — max items (number), category filter (relationship to categories, optional), section heading, intro text, "View All" CTA link, background variant
-- [ ] **6.4** Build render component — queries News/Posts collection, renders cards with featured image, category badge, title, responsive
+- [x] **6.3** Define Payload schema — max items (number), category filter (relationship to categories, optional), section heading, intro text, "View All" CTA link, background variant
+- [x] **6.4** Build render component — queries News/Posts collection, renders cards with featured image, category badge, title, responsive
 
 ### `testimonials`
-- [ ] **6.5** Define Payload schema — testimonials (array of: pullquote text, full quote rich text, attribution name + org, optional photo), auto-advance (boolean), background variant
-- [ ] **6.6** Build render component (client component for carousel) — single testimonial visible, prev/next buttons, pullquote on left + full quote on right (stacks on mobile), optional auto-advance
+- [x] **6.5** Define Payload schema — testimonials (array of: pullquote text, full quote rich text, attribution name + org, optional photo), auto-advance (boolean), background variant
+- [x] **6.6** Build render component (client component for carousel) — single testimonial visible, prev/next buttons, pullquote on left + full quote on right (stacks on mobile), optional auto-advance
 
 ### `sponsors-grid`
-- [ ] **6.7** Define Payload schema — tiers (array of: tier name, logos array of media upload + link URL, display mode select `grid`/`carousel`), background variant
-- [ ] **6.8** Build render component — tier heading + logo row, carousel mode with prev/next (client component for carousel logic), uniform logo height
+- [x] **6.7** Define Payload schema — tiers (array of: tier name, logos array of media upload + link URL, display mode select `grid`/`carousel`), background variant
+- [x] **6.8** Build render component — tier heading + logo row, carousel mode with prev/next (client component for carousel logic), uniform logo height
 
 ### Block registration
-- [ ] **6.9** Register all new blocks in Pages collection config
-- [ ] **6.10** Update `RenderBlocks.tsx`
-- [ ] **6.11** Generate types and validate
+- [x] **6.9** Register all new blocks in Pages collection config
+- [x] **6.10** Update `RenderBlocks.tsx`
+- [x] **6.11** Generate types and validate
 
 ---
 
@@ -203,13 +211,15 @@ Members, Membership Tiers, and Orders are **Payload collections** (for data stor
 - [ ] **9.2** Add access control — admin/staff full access, members can read own record (for portal), public read limited fields for directory (future)
 - [ ] **9.3** Feature-flag gate the collection
 - [ ] **9.4** Add `admin.group: 'Members'` for sidebar organization
+- [ ] **9.10** Staff-assisted onboarding workflow (MVP path) — create a staff-centric onboarding flow in admin/CRM for adding a new member with sane defaults, required validation, and internal notes/tasks
+- [ ] **9.11** Reusable onboarding service layer — centralize onboarding logic in Next.js services so both staff onboarding and future self-serve onboarding use the same validation and side effects
 
 ### Membership Tiers
 - [ ] **9.4** Create Membership Tiers collection — name, annual price (number), features list (array of text), description (rich text), display order, Stripe Price ID (text, optional)
 - [ ] **9.5** Build `membership-tiers` block — Payload schema (section heading, optional intro text, background variant) + render component (tier cards with pricing, feature list, CTA)
 
 ### Orders
-- [ ] **9.6** Create Orders collection — event (relationship), ticket type identifier, purchaser name + email, Stripe Payment Intent ID, status (pending/confirmed/refunded), QR token (text, auto-generated), quantity
+- [ ] **9.6** Create Orders collection — event (relationship), ticket type identifier, purchaser name + email, **optional** member relationship (nullable), Stripe Payment Intent ID, status (pending/confirmed/refunded), QR token (text, auto-generated), quantity
 - [ ] **9.7** Add access control — admin read/update, no public create (API endpoint handles creation)
 - [ ] **9.8** Feature-flag gate (gated on `ticketing`)
 
@@ -234,13 +244,13 @@ Members, Membership Tiers, and Orders are **Payload collections** (for data stor
 - [ ] **11.3** Write tests for fee calculation logic (TDD: percentage fee, flat fee, no fee, edge cases)
 
 ### API routes
-- [ ] **11.4** Create checkout API route — `app/api/checkout/route.ts` — validates request, calls createPaymentIntent, returns client secret
+- [ ] **11.4** Create checkout API route — `app/api/checkout/route.ts` — validates request, calls createPaymentIntent, returns client secret; **must support guest checkout (no member auth required)**
 - [ ] **11.5** Create webhook handler — `app/api/webhooks/stripe/route.ts` — verifies signature, handles `payment_intent.succeeded`, creates Order, generates QR token
 
 ### Frontend checkout
 - [ ] **11.6** Build ticket selection UI on event detail page — select ticket type, quantity, see price breakdown including service fee
 - [ ] **11.7** Integrate Stripe Elements for payment form
-- [ ] **11.8** Build confirmation page — order summary, QR code display
+- [ ] **11.8** Build confirmation page — order summary, QR code display (works for both guests and logged-in members)
 
 ### Testing
 - [ ] **11.9** Write integration tests for the checkout → webhook → order creation flow
@@ -294,7 +304,7 @@ The member portal is a **Next.js sub-app** under `/members/*` — standard React
 
 ### Auth
 - [ ] **15.1** Install and configure NextAuth/AuthJS with credentials provider (email + password)
-- [ ] **15.2** Member registration flow — email verification, profile creation, links to Members collection record
+- [ ] **15.2** Member self-onboarding flow (post staff-first rollout) — friendly registration/join path with email verification, profile creation, and link to Members collection record
 - [ ] **15.3** Password reset flow
 - [ ] **15.4** Session management — JWT or database sessions, configurable timeout
 
@@ -314,22 +324,39 @@ The member portal is a **Next.js sub-app** under `/members/*` — standard React
 
 ---
 
-## Phase 16: Forums & Governance (Future)
+## Phase 16: Visual Page Editor Investigation
+
+- [ ] **16.1** Evaluate [Puck](https://github.com/measuredco/puck) — MIT-licensed embeddable React visual page editor. Install in a throwaway branch, define 2–3 block types, assess UX quality and integration complexity with our Payload backend.
+- [ ] **16.2** Prototype Puck integration — build a proof-of-concept custom admin view that embeds Puck for page editing, mapping Puck's JSON output to our existing Payload block schema. Assess whether the improved editing UX justifies the added React dependency.
+- [ ] **16.3** Decision gate — adopt Puck as the page editor, stick with Payload's built-in block editing, or identify a hybrid approach. Document the decision and rationale.
+
+---
+
+## Phase 17: Forums & Governance (Future)
 
 These build on the member portal and are part of the long-term "democracy in a box" vision. Not in MVP scope but documented to ensure architecture decisions don't block them.
 
 ### Forums
-- [ ] **16.1** Discussion board data model — topics, threads, posts (likely Payload collections or direct DB tables depending on scale)
-- [ ] **16.2** Forum UI — member-only, moderation tools for staff
-- [ ] **16.3** "Official meeting" designation on threads — defined open/close dates, participation tracking for quorum
-- [ ] **16.4** Email notifications for subscribed threads
+- [ ] **17.1** Discussion board data model — topics, threads, posts (likely Payload collections or direct DB tables depending on scale)
+- [ ] **17.2** Forum UI — member-only, moderation tools for staff
+- [ ] **17.3** "Official meeting" designation on threads — defined open/close dates, participation tracking for quorum
+- [ ] **17.4** Email notifications for subscribed threads
 
 ### Voting & Elections
-- [ ] **16.5** Motion/resolution creation — staff creates motion, defines voting window
-- [ ] **16.6** Ballot casting UI — one-member-one-vote enforcement, secret ballot option
-- [ ] **16.7** Board elections — nomination period, candidate profiles, ranked-choice or plurality voting
-- [ ] **16.8** Results tabulation and publication
-- [ ] **16.9** Audit trail — who voted and when (but not how, for secret ballots)
+- [ ] **17.5** Motion/resolution creation — staff creates motion, defines voting window
+- [ ] **17.6** Ballot casting UI — one-member-one-vote enforcement, secret ballot option
+- [ ] **17.7** Board elections — nomination period, candidate profiles, ranked-choice or plurality voting
+- [ ] **17.8** Results tabulation and publication
+- [ ] **17.9** Audit trail — who voted and when (but not how, for secret ballots)
+
+---
+
+## Phase 18: External Accounting Integrations (Later Nice-to-Have)
+
+- [ ] **18.1** Design integration boundary — define outbound sync events for member create/update and optional order/invoice updates
+- [ ] **18.2** Implement Xero connector (optional, feature-flagged) — OAuth setup, contact/customer mapping, retry-safe background sync jobs
+- [ ] **18.3** Add sync status visibility in admin — last sync time, error state, manual re-sync action
+- [ ] **18.4** Failure isolation rule — Xero outages/errors must never block member onboarding, checkout, or core CRM operations
 
 ---
 

@@ -35,6 +35,7 @@ Chamber OS is **not** a CMS with business features bolted on. It's a business pl
 **Next.js handles application logic:**
 - Member portal (`/members/*`) — a semi-separate sub-app with its own auth (NextAuth/AuthJS), purpose-built dashboard pages, profile editing, payment history. Standard React pages, not Payload views.
 - Event registration & checkout — API routes + Stripe, purpose-built UI
+- Event attendance is **not member-only** — guest checkout is a first-class path. Member linkage is optional enrichment, not a hard requirement for ticket purchase.
 - Board governance, voting, forums (future) — pure application code
 - Public member directory, event calendar with RSVP — standard Next.js pages querying the database
 
@@ -277,10 +278,13 @@ The service fee feature supports the ED's vision of Chamber OS as a revenue tool
 ### `orders`
 - Relationship to `event` and `ticket-type`
 - Purchaser name + email
+- Optional relationship to `member` (nullable) when purchaser is a logged-in member
 - Stripe Payment Intent ID
 - Status: pending / confirmed / refunded
 - QR code token (UUID, generated on confirmation)
 - Quantity
+
+**Important modeling rule:** An attendee does not need to be a Chamber member. Orders must support guest purchasers/attendees without creating a Members record.
 
 ### `members`
 - Contact info (name, email, phone, address)
@@ -290,6 +294,19 @@ The service fee feature supports the ED's vision of Chamber OS as a revenue tool
 - Renewal date
 - Notes (rich text)
 - Relationships to: orders, invoices
+
+### Member Onboarding Strategy (Rollout)
+
+1. **Staff-assisted onboarding first (MVP path):**
+  - Chamber staff creates and manages member records through CRM/admin workflows.
+  - This supports higher-touch onboarding and keeps data quality tight while processes are new.
+2. **Friendly self-onboarding next:**
+  - Add a public/self-serve join flow after the staff workflow is stable.
+  - The same onboarding pipeline should support both staff-created and self-created members.
+3. **Accounting sync later (nice-to-have):**
+  - Start with internal member/order data as source of truth.
+  - Add optional downstream sync to **Xero** later to auto-populate accounting/customer records.
+  - Integration should be asynchronous and failure-tolerant (never block onboarding/checkout).
 
 ### `membership-tiers`
 - Name (e.g., "Small Business", "Corporate", "Non-Profit")
@@ -539,6 +556,9 @@ The project is initialized from the Payload CMS website template. What exists:
 ## Notes for the Agent
 
 - **Know the boundary:** Payload for content (pages, posts, media, site config). Custom admin views for business workflows (CRM, event management, order management). Next.js pages for member-facing features (portal, checkout, directory). Don't cram application logic into Payload collections — use collections for data storage and custom views for purpose-built UIs.
+- **Guest-friendly events:** Ticketing must support non-member attendees by default. If a purchaser is authenticated as a member, link the order to that member record; otherwise store purchaser/attendee details directly on the order.
+- **Onboarding priority:** Staff-assisted member onboarding ships first; self-serve onboarding follows using the same core service layer.
+- **External syncs are downstream:** Xero sync is a later enhancement and must never be a hard dependency for creating/updating members.
 - Prefer explicit, readable code over clever abstractions — this codebase will be maintained by one developer and eventually handed off
 - All block render components should output semantic HTML with minimal wrapper divs
 - CSS should use Tailwind utility classes for layout, CSS custom properties for theme values

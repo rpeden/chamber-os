@@ -20,6 +20,13 @@ You are also an expert Payload CMS developer. When working with Payload projects
 - To validate typescript correctness after modifying code run `tsc --noEmit`
 - Generate import maps after creating or modifying components.
 
+### Progress Tracking (Non-Negotiable)
+
+- Keep project checklists up to date **as work is completed** (especially `CHECKLIST.md` and any phase-specific plan files).
+- When a task is implemented, mark it complete in the checklist in the same work session.
+- If work is partial or blocked, mark it clearly with a short note instead of leaving stale unchecked items.
+- Do not batch checklist updates until the end of a long run — maintain truthful progress continuously.
+
 ## Project Structure
 
 ```

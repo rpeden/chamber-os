@@ -1,0 +1,147 @@
+import type { Metadata } from 'next'
+
+import Link from 'next/link'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import React, { cache } from 'react'
+import RichText from '@/components/RichText'
+
+import { Media } from '@/components/Media'
+import { PayloadRedirects } from '@/components/PayloadRedirects'
+
+type Args = {
+  params: Promise<{
+    slug?: string
+  }>
+}
+
+const formatDateRange = (startDate: string, endDate: string): string => {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  })
+
+  return `${formatter.format(new Date(startDate))} – ${formatter.format(new Date(endDate))}`
+}
+
+export async function generateStaticParams() {
+  const payload = await getPayload({ config: configPromise })
+  const events = await payload.find({
+    collection: 'events',
+    limit: 1000,
+    overrideAccess: false,
+    pagination: false,
+    where: {
+      status: {
+        equals: 'published',
+      },
+    },
+    select: {
+      slug: true,
+    },
+  })
+
+  return events.docs.map(({ slug }) => ({ slug }))
+}
+
+export default async function EventDetailPage({ params: paramsPromise }: Args) {
+  const { slug = '' } = await paramsPromise
+  const decodedSlug = decodeURIComponent(slug)
+  const url = `/events/${decodedSlug}`
+  const event = await queryEventBySlug({ slug: decodedSlug })
+
+  if (!event) return <PayloadRedirects url={url} />
+
+  return (
+    <article className="pb-16">
+      <PayloadRedirects disableNotFound url={url} />
+
+      <section className="container pt-24 pb-8">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">{event.title}</h1>
+        <p className="text-muted-foreground mb-2">
+          {formatDateRange(event.startDate, event.endDate)}
+        </p>
+        <p className="text-muted-foreground">{event.location}</p>
+      </section>
+
+      {event.featuredImage && typeof event.featuredImage === 'object' && (
+        <section className="container mb-8">
+          <div className="overflow-hidden rounded-xl">
+            <Media resource={event.featuredImage} imgClassName="w-full h-auto" />
+          </div>
+        </section>
+      )}
+
+      <section className="container">
+        <div className="max-w-3xl">
+          <RichText data={event.description} enableGutter={false} />
+
+          {event.ticketingType === 'external-link' && event.externalTicketUrl && (
+            <div className="mt-8">
+              <Link
+                className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium"
+                href={event.externalTicketUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Get Tickets
+              </Link>
+            </div>
+          )}
+
+          {event.ticketingType === 'chamber-managed' && (
+            <div className="mt-8 rounded-md border border-border p-4 bg-card">
+              <p className="text-sm text-muted-foreground">
+                Chamber-managed ticket checkout is coming in a later phase.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </article>
+  )
+}
+
+export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  const { slug = '' } = await paramsPromise
+  const decodedSlug = decodeURIComponent(slug)
+  const event = await queryEventBySlug({ slug: decodedSlug })
+
+  if (!event) {
+    return {
+      title: 'Event Not Found',
+    }
+  }
+
+  return {
+    title: `${event.title} | Events`,
+    description: `Details for ${event.title} at ${event.location}.`,
+  }
+}
+
+const queryEventBySlug = cache(async ({ slug }: { slug: string }) => {
+  const payload = await getPayload({ config: configPromise })
+
+  const result = await payload.find({
+    collection: 'events',
+    limit: 1,
+    overrideAccess: false,
+    pagination: false,
+    where: {
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: 'published',
+          },
+        },
+      ],
+    },
+  })
+
+  return result.docs?.[0] || null
+})

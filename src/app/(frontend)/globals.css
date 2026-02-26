@@ -17,6 +17,7 @@
   h4,
   h5,
   h6 {
+    font-family: var(--theme-heading-font);
     font-weight: unset;
     font-size: unset;
   }
@@ -44,7 +45,7 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-montserrat);
 }
 
 @layer utilities {
@@ -88,11 +89,11 @@
 
 :root {
   /* Chamber OS theme — overridden by site-settings injection */
-  --theme-primary: #1e3a5f;
-  --theme-secondary: #2d5f8a;
-  --theme-accent: #e8a317;
-  --theme-heading-font: system-ui, -apple-system, sans-serif;
-  --theme-body-font: system-ui, -apple-system, sans-serif;
+  --theme-primary: #1a3550;
+  --theme-secondary: #2d5a3e;
+  --theme-accent: #d4a843;
+  --theme-heading-font: var(--font-montserrat), 'Montserrat', sans-serif;
+  --theme-body-font: var(--font-montserrat), 'Montserrat', sans-serif;
 
   --background: oklch(100% 0 0deg);
   --foreground: oklch(14.5% 0 0deg);
@@ -224,6 +225,11 @@
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
   }
+}
+
+body {
+  font-size: 18px;
+  line-height: 1.7;
 }
 
 html {

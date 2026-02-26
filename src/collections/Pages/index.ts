@@ -7,6 +7,17 @@ import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { TextColumns } from '../../blocks/TextColumns/config'
+import { CardGrid } from '../../blocks/CardGrid/config'
+import { IconGrid } from '../../blocks/IconGrid/config'
+import { ImageText } from '../../blocks/ImageText/config'
+import { CtaBanner } from '../../blocks/CtaBanner/config'
+import { StatsBar } from '../../blocks/StatsBar/config'
+import { MixedContentRow } from '../../blocks/MixedContentRow/config'
+import { EventsList } from '../../blocks/EventsList/config'
+import { NewsFeed } from '../../blocks/NewsFeed/config'
+import { Testimonials } from '../../blocks/Testimonials/config'
+import { SponsorsGrid } from '../../blocks/SponsorsGrid/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -72,7 +83,24 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                TextColumns,
+                CardGrid,
+                IconGrid,
+                ImageText,
+                CtaBanner,
+                StatsBar,
+                MixedContentRow,
+                EventsList,
+                NewsFeed,
+                Testimonials,
+                SponsorsGrid,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
