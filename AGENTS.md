@@ -1470,3 +1470,5 @@ Because AI agents have a bad habit of "tidying up" the git state by stashing or 
 - Examples: https://github.com/payloadcms/payload/tree/main/examples
 - Templates: https://github.com/payloadcms/payload/tree/main/templates
 - UI look: `example-ui` folder. For the initial release, we're aiming for a clean, modern look resembling the Ottawa Board of Trade screenshots in this folder.
+
+DO NOT ADD OR UPDATE FEATURES WITHOUT ADDING OR UPDATING TESTS!

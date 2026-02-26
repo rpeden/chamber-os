@@ -43,10 +43,32 @@ export const hero: Field = {
       },
     },
     {
+      name: 'textLayout',
+      type: 'select',
+      defaultValue: 'heading-subheading',
+      label: 'Text Layout',
+      options: [
+        {
+          label: 'Heading + Subheading',
+          value: 'heading-subheading',
+        },
+        {
+          label: 'Single Text',
+          value: 'single-text',
+        },
+      ],
+      admin: {
+        condition: (_, { type } = {}) => type === 'fullBleed',
+        description:
+          'Heading + Subheading: two lines of text at different sizes. Single Text: one line at a comfortable reading size, no secondary text.',
+      },
+    },
+    {
       name: 'subheading',
       type: 'text',
       admin: {
-        condition: (_, { type } = {}) => type !== 'none',
+        condition: (_, { type, textLayout } = {}) =>
+          type !== 'none' && textLayout !== 'single-text',
         description: 'Optional secondary text below the heading.',
       },
     },

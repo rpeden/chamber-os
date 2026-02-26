@@ -170,6 +170,10 @@ export interface Page {
      */
     heading?: string | null;
     /**
+     * Heading + Subheading: two lines of text at different sizes. Single Text: one line at a comfortable reading size, no secondary text.
+     */
+    textLayout?: ('heading-subheading' | 'single-text') | null;
+    /**
      * Optional secondary text below the heading.
      */
     subheading?: string | null;
@@ -1814,6 +1818,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         type?: T;
         heading?: T;
+        textLayout?: T;
         subheading?: T;
         media?: T;
         overlayOpacity?: T;

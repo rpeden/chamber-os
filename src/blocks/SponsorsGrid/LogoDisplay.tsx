@@ -33,7 +33,7 @@ export function LogoCarousel({ logos }: LogoCarouselProps) {
         onClick={prev}
         disabled={offset === 0}
         className={cn(
-          'flex-shrink-0 w-10 h-10 rounded-full border border-border flex items-center justify-center transition-colors',
+          'shrink-0 w-10 h-10 rounded-full border border-border flex items-center justify-center transition-colors',
           offset === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-muted',
         )}
         aria-label="Previous sponsors"
@@ -67,7 +67,7 @@ export function LogoCarousel({ logos }: LogoCarouselProps) {
         onClick={next}
         disabled={offset >= maxOffset}
         className={cn(
-          'flex-shrink-0 w-10 h-10 rounded-full border border-border flex items-center justify-center transition-colors',
+          'shrink-0 w-10 h-10 rounded-full border border-border flex items-center justify-center transition-colors',
           offset >= maxOffset ? 'opacity-30 cursor-not-allowed' : 'hover:bg-muted',
         )}
         aria-label="Next sponsors"
@@ -96,12 +96,15 @@ function LogoItem({ item }: { item: Logo }) {
 
   const inner = (
     <div
-      className="flex items-center justify-center h-24 w-40 overflow-hidden"
+      className="relative h-40 w-64 shrink-0 overflow-hidden"
       title={item.sponsorName ?? undefined}
     >
       <Media
         resource={item.logo as NonNullable<typeof item.logo>}
-        imgClassName="h-24 w-40 object-contain"
+        fill
+        size="(max-width: 768px) 45vw, 16rem"
+        imgClassName="object-contain scale-125"
+        disablePlaceholder
       />
     </div>
   )
@@ -112,14 +115,14 @@ function LogoItem({ item }: { item: Logo }) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-200 opacity-70 hover:opacity-100"
+        className="shrink-0 grayscale hover:grayscale-0 transition-all duration-200 opacity-70 hover:opacity-100"
       >
         {inner}
       </a>
     )
   }
 
-  return <div className="flex-shrink-0 opacity-70">{inner}</div>
+  return <div className="shrink-0 opacity-70">{inner}</div>
 }
 
 /**
@@ -137,13 +140,13 @@ export function LogoGrid({ logos }: { logos: Logo[] }) {
         if (!hasLogo) return null
 
         const inner = (
-          <div
-            className="flex items-center justify-center h-24 w-40 overflow-hidden"
-            title={item.sponsorName ?? undefined}
-          >
+          <div className="relative h-40 w-64 overflow-hidden" title={item.sponsorName ?? undefined}>
             <Media
               resource={item.logo as NonNullable<typeof item.logo>}
-              imgClassName="h-24 w-40 object-contain"
+              fill
+              size="(max-width: 768px) 45vw, 16rem"
+              imgClassName="object-contain scale-125"
+              disablePlaceholder
             />
           </div>
         )

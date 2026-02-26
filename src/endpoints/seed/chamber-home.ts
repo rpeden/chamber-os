@@ -50,9 +50,8 @@ export function chamberHomepage({
     title: 'Home',
     hero: {
       type: 'fullBleed',
-      heading: 'Southern Hudson Bay Chamber of Commerce',
-      subheading:
-        'Supporting business, building community, and coexisting with wildlife since 1987.',
+      textLayout: 'single-text',
+      heading: 'Supporting business, building community, and coexisting with wildlife since 1987.',
       media: heroImage.id,
       overlayOpacity: 65,
       ctaButtons: [
@@ -81,12 +80,9 @@ export function chamberHomepage({
         blockType: 'content',
         columns: [
           {
-            size: 'full',
-            richText: lexicalRoot(h2('Your Voice in the North')),
-          },
-          {
             size: 'twoThirds',
             richText: lexicalRoot(
+              h2('Your Voice in the North'),
               p(
                 'The Southern Hudson Bay Chamber of Commerce is the collective voice of the business community on the southern shores of Hudson Bay. We advocate for our members at the municipal, provincial, and federal level. We provide networking opportunities, business development resources, and a shared platform for the entrepreneurs and organizations that keep this region thriving.',
               ),
@@ -101,6 +97,9 @@ export function chamberHomepage({
               h3('Get Involved'),
               p(
                 "Whether you're a new business looking for support or an established enterprise seeking to give back, the Chamber has a seat at the table for you.",
+              ),
+              p(
+                'Membership gives you access to networking events, a listing in our business directory, and a community of peers who understand what it takes to operate on the northern frontier.',
               ),
             ),
           },

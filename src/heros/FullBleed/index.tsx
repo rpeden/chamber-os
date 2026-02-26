@@ -25,10 +25,13 @@ type FullBleedHeroProps = Page['hero']
 export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
   heading,
   subheading,
+  textLayout,
   media,
   overlayOpacity = 60,
   ctaButtons,
 }) => {
+  const isSingleText = textLayout === 'single-text'
+
   // Convert 0-100 to 0-1 for CSS opacity
   const opacity = (overlayOpacity ?? 60) / 100
 
@@ -57,37 +60,55 @@ export const FullBleedHero: React.FC<FullBleedHeroProps> = ({
 
         {/* Dark overlay — opacity controlled by the overlayOpacity field */}
         <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/55 to-black/40"
+          className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-black/70 via-black/55 to-black/40"
           style={{ opacity }}
           aria-hidden="true"
         />
 
         {/* Content — flex-1 pushes CTAs toward bottom */}
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center md:py-20">
-          {heading && (
-            <h1
-              className="mb-4 max-w-4xl leading-tight tracking-tight"
-              style={{
-                fontSize: '60px',
-                fontWeight: 500,
-                textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
-              }}
-            >
-              {heading}
-            </h1>
-          )}
-
-          {subheading && (
-            <p
-              className="max-w-2xl text-white"
-              style={{
-                fontSize: '30px',
-                fontWeight: 400,
-                textShadow: '0 2px 10px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.4)',
-              }}
-            >
-              {subheading}
-            </p>
+          {isSingleText ? (
+            // Single-text variant: one line, comfortable reading size
+            heading && (
+              <p
+                className="max-w-4xl leading-snug tracking-tight text-white"
+                style={{
+                  fontSize: '50px',
+                  fontWeight: 400,
+                  textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
+                }}
+              >
+                {heading}
+              </p>
+            )
+          ) : (
+            // Default variant: heading (large/medium-weight) + optional subheading
+            <>
+              {heading && (
+                <h1
+                  className="mb-4 max-w-4xl leading-tight tracking-tight"
+                  style={{
+                    fontSize: '60px',
+                    fontWeight: 500,
+                    textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  {heading}
+                </h1>
+              )}
+              {subheading && (
+                <p
+                  className="max-w-2xl text-white"
+                  style={{
+                    fontSize: '30px',
+                    fontWeight: 400,
+                    textShadow: '0 2px 10px rgba(0,0,0,0.8), 0 0 30px rgba(0,0,0,0.4)',
+                  }}
+                >
+                  {subheading}
+                </p>
+              )}
+            </>
           )}
         </div>
 
