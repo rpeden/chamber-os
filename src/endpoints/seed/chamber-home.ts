@@ -20,7 +20,7 @@
 
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { Media } from '@/payload-types'
-import { lexicalRoot, h2, h3, p, paragraph, text, bold } from './lexical-helpers'
+import { lexicalRoot, h2, h3, p } from './lexical-helpers'
 
 type HomeArgs = {
   heroImage: Media

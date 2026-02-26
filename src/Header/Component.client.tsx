@@ -1,6 +1,7 @@
 'use client'
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
+import NextImage from 'next/image'
 import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -109,18 +110,22 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
 
   return (
     <header ref={headerRef} className={cn('relative z-20 w-full bg-white')}>
-      <div className="container">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-10">
         {/* ── Desktop: OBOT-style — logo left spanning full height, right side has two rows ── */}
-        <div className="hidden md:flex items-stretch">
+        <div className="hidden min-[1091px]:flex items-stretch">
           {/* Logo — spans full header height, vertically centered */}
-          <Link href="/" className="flex items-center gap-3 shrink-0 py-4 pr-8">
+          <Link href="/" className="flex items-center shrink-0 pt-6 pb-4 pr-8 md:pl-2.5 min-w-0">
             {logo?.url ? (
-              <img
-                src={getMediaUrl(logo.url)}
-                alt={logo.alt || siteName}
-                className="max-h-20 w-auto"
-                loading="eager"
-              />
+              <span className="relative block h-[92px] w-[368px] max-w-[42vw]">
+                <NextImage
+                  src={getMediaUrl(logo.url)}
+                  alt={logo.alt || siteName}
+                  fill
+                  sizes="(min-width: 1280px) 368px, (min-width: 768px) 34vw, 240px"
+                  className="object-contain object-left"
+                  priority
+                />
+              </span>
             ) : (
               <span className="text-xl font-bold text-theme-primary font-theme-heading">
                 {siteName}
@@ -129,7 +134,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
           </Link>
 
           {/* Right side — two rows stacked */}
-          <div className="flex-1 flex flex-col justify-between py-3">
+          <div className="flex-1 flex flex-col justify-between pt-5 pb-3">
             {/* Row 1: Utility links + social icons — top-aligned with logo */}
             {(utilityNav.length > 0 || socialLinks.length > 0) && (
               <div className="flex justify-end items-center gap-5">
@@ -245,15 +250,19 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
         </div>
 
         {/* ── Mobile: simple logo + hamburger row ── */}
-        <div className="flex md:hidden justify-between items-center py-3">
-          <Link href="/" className="flex items-center gap-3 shrink-0">
+        <div className="flex min-[1091px]:hidden justify-between items-center py-3">
+          <Link href="/" className="flex items-center shrink-0 min-w-0">
             {logo?.url ? (
-              <img
-                src={getMediaUrl(logo.url)}
-                alt={logo.alt || siteName}
-                className="max-h-14 w-auto"
-                loading="eager"
-              />
+              <span className="relative block h-14 w-[220px] max-w-[70vw]">
+                <NextImage
+                  src={getMediaUrl(logo.url)}
+                  alt={logo.alt || siteName}
+                  fill
+                  sizes="220px"
+                  className="object-contain object-left"
+                  priority
+                />
+              </span>
             ) : (
               <span className="text-xl font-bold text-theme-primary font-theme-heading">
                 {siteName}
@@ -272,8 +281,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background">
-          <div className="container py-4 space-y-1">
+        <div className="min-[1091px]:hidden border-t border-border bg-background">
+          <div className="w-full px-3 sm:px-4 md:px-6 lg:px-10 py-4 space-y-1">
             {navItems.map((item, i) => {
               const hasChildren = item.children && item.children.length > 0
               return (

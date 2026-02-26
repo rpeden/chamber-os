@@ -280,7 +280,7 @@ export const seed = async ({
     data: contactFormData,
   })
 
-  const [, contactPage] = await Promise.all([
+  const [, _contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,

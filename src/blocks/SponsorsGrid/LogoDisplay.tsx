@@ -95,15 +95,12 @@ function LogoItem({ item }: { item: Logo }) {
   if (!hasLogo) return null
 
   const inner = (
-    <div
-      className="relative h-40 w-64 shrink-0 overflow-hidden"
-      title={item.sponsorName ?? undefined}
-    >
+    <div className="relative h-40 w-64 shrink-0" title={item.sponsorName ?? undefined}>
       <Media
         resource={item.logo as NonNullable<typeof item.logo>}
         fill
         size="(max-width: 768px) 45vw, 16rem"
-        imgClassName="object-contain scale-125"
+        imgClassName="object-contain object-center"
         disablePlaceholder
       />
     </div>
@@ -140,12 +137,12 @@ export function LogoGrid({ logos }: { logos: Logo[] }) {
         if (!hasLogo) return null
 
         const inner = (
-          <div className="relative h-40 w-64 overflow-hidden" title={item.sponsorName ?? undefined}>
+          <div className="relative h-40 w-64" title={item.sponsorName ?? undefined}>
             <Media
               resource={item.logo as NonNullable<typeof item.logo>}
               fill
               size="(max-width: 768px) 45vw, 16rem"
-              imgClassName="object-contain scale-125"
+              imgClassName="object-contain object-center"
               disablePlaceholder
             />
           </div>

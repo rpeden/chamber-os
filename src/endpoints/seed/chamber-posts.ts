@@ -8,7 +8,7 @@
 
 import type { RequiredDataFromCollectionSlug } from 'payload'
 import type { Media, User, Category } from '@/payload-types'
-import { h2, h3, lexicalRoot, p, paragraph, bold, text } from './lexical-helpers'
+import { h2, lexicalRoot, p, paragraph, bold, text } from './lexical-helpers'
 
 type PostDeps = {
   heroImage: Media
