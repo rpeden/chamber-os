@@ -21,6 +21,8 @@
     "test": "pnpm run test:unit && pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "test:stripe:live": "cross-env NODE_OPTIONS=--no-deprecation RUN_STRIPE_LIVE=1 vitest run --config ./vitest.stripe-live.config.mts",
+    "test:stripe:live:watch": "cross-env NODE_OPTIONS=--no-deprecation RUN_STRIPE_LIVE=1 vitest --config ./vitest.stripe-live.config.mts",
     "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.unit.config.mts"
   },
   "dependencies": {
@@ -39,6 +41,9 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
+    "@stripe/react-stripe-js": "^5.6.0",
+    "@stripe/stripe-js": "^8.8.0",
+    "@types/qrcode": "^1.5.6",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
@@ -50,10 +55,12 @@
     "next-sitemap": "^4.2.3",
     "payload": "3.77.0",
     "prism-react-renderer": "^2.3.1",
+    "qrcode": "^1.5.4",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-hook-form": "7.71.1",
     "sharp": "0.34.2",
+    "stripe": "^20.4.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6"
   },

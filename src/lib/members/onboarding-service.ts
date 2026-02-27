@@ -37,6 +37,18 @@ export interface NewIndividualMemberInput {
 }
 
 /**
+ * Input for onboarding when organization Contact already exists.
+ */
+export interface ExistingOrgMemberInput {
+  orgContactId: string | number
+  primaryContactId?: string | number
+  primaryContactName?: string
+  primaryContactEmail?: string
+  primaryContactPhone?: string
+  membershipTierId?: number
+}
+
+/**
  * Result of an onboarding operation.
  */
 export interface OnboardingResult {
@@ -195,6 +207,88 @@ export class OnboardingService {
     return {
       contactId: contact.id,
       memberId: member.id,
+    }
+  }
+
+  /**
+   * Onboards a member using an existing organization Contact.
+   *
+   * Supports either selecting an existing primary contact or creating one.
+   */
+  async onboardOrganizationFromExisting(
+    input: ExistingOrgMemberInput,
+    actorId: string,
+    req?: PayloadRequest,
+  ): Promise<OnboardingResult> {
+    const orgContactId =
+      typeof input.orgContactId === 'string' ? Number(input.orgContactId) : input.orgContactId
+
+    const orgContact = await this.payload.findByID({
+      collection: 'contacts',
+      id: orgContactId,
+      depth: 0,
+      req,
+    })
+
+    if (!orgContact || orgContact.type !== 'organization') {
+      throw new Error('Selected contact is not an organization')
+    }
+
+    let primaryContactId = input.primaryContactId
+
+    if (typeof primaryContactId === 'string') {
+      primaryContactId = Number(primaryContactId)
+    }
+
+    if (!primaryContactId && input.primaryContactName) {
+      const createdPrimaryContact = await this.payload.create({
+        collection: 'contacts',
+        data: {
+          name: input.primaryContactName,
+          email: input.primaryContactEmail,
+          phone: input.primaryContactPhone,
+          type: 'person',
+          organization: orgContact.id,
+        },
+        req,
+      })
+
+      primaryContactId = createdPrimaryContact.id
+    }
+
+    const member = await this.payload.create({
+      collection: 'members',
+      data: {
+        contact: orgContact.id,
+        primaryContact: primaryContactId,
+        membershipTier: input.membershipTierId,
+        status: 'pending',
+        joinedDate: new Date().toISOString(),
+      },
+      req,
+    })
+
+    await this.audit.log(
+      {
+        entityType: 'member',
+        entityId: String(member.id),
+        action: 'onboarded',
+        toState: 'pending',
+        actorId,
+        actorType: 'staff',
+        metadata: {
+          type: 'organization-existing',
+          orgContactId: String(orgContact.id),
+          primaryContactId: primaryContactId ? String(primaryContactId) : undefined,
+        },
+      },
+      req,
+    )
+
+    return {
+      contactId: orgContact.id,
+      memberId: member.id,
+      primaryContactId,
     }
   }
 }

@@ -19,6 +19,7 @@ import { NewsFeed } from '../../blocks/NewsFeed/config'
 import { Testimonials } from '../../blocks/Testimonials/config'
 import { SponsorsGrid } from '../../blocks/SponsorsGrid/config'
 import { MembershipTiersBlock } from '../../blocks/MembershipTiers/config'
+import { MapEmbed } from '../../blocks/MapEmbed/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -106,6 +107,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 MediaBlock,
                 Archive,
                 FormBlock,
+                MapEmbed,
               ],
               required: true,
               admin: {

@@ -1,9 +1,9 @@
 /**
- * Stripe integration placeholder.
+ * Stripe integration barrel export.
  *
- * This module will hold the Stripe client initialization,
- * Payment Intent creation, webhook processing, and fee calculation
- * logic when ticketing is implemented in Phase 11.
+ * Server-side Stripe client, Payment Intent creation, and
+ * supporting types for the checkout flow.
  */
-
-// TODO: Phase 11 — Initialize Stripe client, payment intents, webhooks
+export { getStripe } from './client'
+export { createPaymentIntent } from './create-payment-intent'
+export type { CreatePaymentIntentInput, PaymentIntentResult } from './create-payment-intent'

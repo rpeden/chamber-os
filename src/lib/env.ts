@@ -23,6 +23,9 @@ const envSchema = z.object({
   /** Stripe secret key — required for ticketing (Phase 11) */
   STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
 
+  /** Stripe publishable key — exposed to the client for Stripe Elements */
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_').optional(),
+
   /** Stripe webhook signing secret */
   STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
 

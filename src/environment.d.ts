@@ -4,6 +4,7 @@ declare global {
       PAYLOAD_SECRET: string
       DATABASE_URL: string
       NEXT_PUBLIC_SERVER_URL: string
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string
       VERCEL_PROJECT_PRODUCTION_URL: string
     }
   }

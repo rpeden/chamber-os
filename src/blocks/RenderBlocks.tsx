@@ -19,6 +19,7 @@ import { NewsFeedBlock } from '@/blocks/NewsFeed/Component'
 import { TestimonialsBlock } from '@/blocks/Testimonials/Component'
 import { SponsorsGridBlock } from '@/blocks/SponsorsGrid/Component'
 import { MembershipTiersBlock } from '@/blocks/MembershipTiers/Component'
+import { MapEmbedBlock } from '@/blocks/MapEmbed/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -38,6 +39,7 @@ const blockComponents = {
   testimonials: TestimonialsBlock,
   sponsorsGrid: SponsorsGridBlock,
   membershipTiers: MembershipTiersBlock,
+  mapEmbed: MapEmbedBlock,
 }
 
 export const RenderBlocks: React.FC<{

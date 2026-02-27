@@ -9,6 +9,8 @@ import RichText from '@/components/RichText'
 import { Media } from '@/components/Media'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import { getServerSideURL } from '@/utilities/getURL'
+import { TicketCheckout } from '@/components/TicketCheckout'
+import { env } from '@/lib/env'
 
 type Args = {
   params: Promise<{
@@ -120,13 +122,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </div>
           )}
 
-          {event.ticketingType === 'chamber-managed' && (
-            <div className="mt-8 rounded-md border border-border p-4 bg-card">
-              <p className="text-sm text-muted-foreground">
-                Chamber-managed ticket checkout is coming in a later phase.
-              </p>
-            </div>
-          )}
+          {event.ticketingType === 'chamber-managed' &&
+            event.ticketTypes &&
+            event.ticketTypes.length > 0 &&
+            env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+              <TicketCheckout
+                eventId={event.id}
+                eventTitle={event.title}
+                ticketTypes={event.ticketTypes}
+                serviceFee={event.serviceFee}
+                stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+              />
+            )}
         </div>
       </section>
     </article>

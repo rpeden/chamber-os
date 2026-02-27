@@ -225,7 +225,7 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 - [x] **9.1** Create Members collection — contact relationship (required → Contacts, the entity that IS the member — org or person), primary contact relationship (optional → Contacts, the go-to human when member is an org), membership tier (relationship → Membership Tiers), status (`pending` | `active` | `lapsed` | `cancelled` | `reinstated`), renewal date, joined date, stripe customer ID (optional), xero contact ID (optional, for accounting sync), internal notes (rich text). Admin labels: singular "Member", plural "Members".
 - [x] **9.2** Add access control — admin/staff full access, members can read own record via portal (with `overrideAccess: false`), no public access
 - [x] **9.3** Add `admin.group: 'Members & Contacts'` for sidebar organization
-- [ ] **9.10** Staff-assisted onboarding workflow (MVP path) — admin/CRM flow with two paths: "New Organization Member" (create/select org Contact, select/create primary contact person) and "New Individual Member" shortcut (creates person Contact + Member in one step)
+- [x] **9.10** Staff-assisted onboarding workflow (MVP path) — admin/CRM flow with two paths: "New Organization Member" (create/select org Contact, select/create primary contact person) and "New Individual Member" shortcut (creates person Contact + Member in one step). Implemented via dashboard onboarding panel + `/api/staff/onboarding` endpoint backed by `OnboardingService`.
 - [x] **9.11** Create `src/lib/members/membership-service.ts` — lifecycle transitions (activate, lapse, reinstate, cancel) with audit logging via `AuditService`. No lifecycle logic in hooks.
 - [x] **9.12** Create `src/lib/members/onboarding-service.ts` — centralized onboarding logic used by both staff-assisted and future self-serve flows. Creates Contact + Member records atomically.
 - [x] **9.13** Create `src/lib/audit/audit-service.ts` — append-only logging for critical transitions (member status changes, order status changes, payment events). See ADR-7.
@@ -247,9 +247,9 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 
 ## Phase 10: Remaining Blocks
 
-- [ ] **10.1** `contact-form` — likely leverage existing FormBlock from Payload's form-builder plugin, or build custom if the plugin is too heavy
-- [ ] **10.2** `map-embed` — Payload schema (address, lat/lng, zoom level, optional overlay text) + render component (iframe embed or Leaflet/Mapbox)
-- [ ] **10.3** Register and validate
+- [x] **10.1** `contact-form` — leveraged existing `FormBlock` from Payload's form-builder plugin (already registered in Pages layout)
+- [x] **10.2** `map-embed` — Payload schema (address, lat/lng, zoom level, optional overlay text) + render component (iframe embed)
+- [x] **10.3** Register and validate
 
 ---
 
@@ -258,21 +258,21 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 > **All payment logic lives in `src/lib/stripe/` and `src/lib/orders/`.** No Stripe API calls in hooks or API route handlers directly. API routes validate input and delegate to service functions. See ADR-3.
 
 ### Payment infrastructure
-- [ ] **11.1** Create `lib/stripe/client.ts` — initialized Stripe SDK with env validation
-- [ ] **11.2** Create `lib/stripe/create-payment-intent.ts` — takes event ID, ticket type, quantity; calculates total including service fee; creates Payment Intent; returns client secret
-- [ ] **11.3** Write tests for fee calculation logic (TDD: percentage fee, flat fee, no fee, edge cases)
+- [x] **11.1** Create `lib/stripe/client.ts` — initialized Stripe SDK with env validation
+- [x] **11.2** Create `lib/stripe/create-payment-intent.ts` — takes event ID, ticket type, quantity; calculates total including service fee; creates Payment Intent; returns client secret
+- [x] **11.3** Write tests for fee calculation logic (TDD: percentage fee, flat fee, no fee, edge cases)
 
 ### API routes
-- [ ] **11.4** Create checkout API route — `app/api/checkout/route.ts` — validates request, calls createPaymentIntent, returns client secret; **must support guest checkout (no member auth required)**
-- [ ] **11.5** Create webhook handler — `app/api/webhooks/stripe/route.ts` — verifies signature, delegates to `OrderService.confirmFromWebhook()` which handles idempotent order confirmation, QR token generation, audit logging, and confirmation email. Webhook handler is thin.
+- [x] **11.4** Create checkout API route — `app/api/checkout/route.ts` — validates request, calls createPaymentIntent, returns client secret + paymentIntentId; **must support guest checkout (no member auth required)**
+- [x] **11.5** Create webhook handler — `app/api/webhooks/stripe/route.ts` — verifies signature, delegates to `OrderService.confirmFromWebhook()` which handles idempotent order confirmation, QR token generation, audit logging, and confirmation email. Webhook handler is thin.
 
 ### Frontend checkout
-- [ ] **11.6** Build ticket selection UI on event detail page — select ticket type, quantity, see price breakdown including service fee
-- [ ] **11.7** Integrate Stripe Elements for payment form
-- [ ] **11.8** Build confirmation page — order summary, QR code display (works for both guests and logged-in members)
+- [x] **11.6** Build ticket selection UI on event detail page — select ticket type, quantity, see price breakdown including service fee
+- [x] **11.7** Integrate Stripe Elements for payment form
+- [x] **11.8** Build confirmation page — order summary, QR code display (works for both guests and logged-in members)
 
 ### Testing
-- [ ] **11.9** Write integration tests for the checkout → webhook → order creation flow
+- [x] **11.9** Write integration tests for the checkout → webhook → order creation flow
 - [ ] **11.10** Test with Stripe test mode keys
 
 ---

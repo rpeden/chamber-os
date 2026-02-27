@@ -2,6 +2,7 @@ import React from 'react'
 import { getPayload } from 'payload'
 import type { Where } from 'payload'
 import config from '@payload-config'
+import { MemberOnboardingPanel } from './MemberOnboardingPanel'
 
 import './index.scss'
 
@@ -48,6 +49,8 @@ const BeforeDashboard: React.FC = async () => {
     lapsedCount,
     overdueCount,
     tierBreakdown,
+    organizationContacts,
+    personContacts,
   ] = await Promise.all([
     payload.find({
       collection: 'events',
@@ -106,6 +109,22 @@ const BeforeDashboard: React.FC = async () => {
       select: { name: true },
       depth: 0,
     }),
+    payload.find({
+      collection: 'contacts',
+      sort: 'name',
+      limit: 200,
+      where: { type: { equals: 'organization' } },
+      select: { name: true },
+      depth: 0,
+    }),
+    payload.find({
+      collection: 'contacts',
+      sort: 'name',
+      limit: 300,
+      where: { type: { equals: 'person' } },
+      select: { name: true },
+      depth: 0,
+    }),
   ])
 
   // Count active members per tier (parallel)
@@ -145,7 +164,10 @@ const BeforeDashboard: React.FC = async () => {
           <span className={`${baseClass}__stat-label`}>Active Members</span>
         </a>
         {overdueCount.totalDocs > 0 && (
-          <a href="/admin/collections/members?where[and][0][status][equals]=active&where[and][1][renewalDate][less_than]=${now}" className={`${baseClass}__stat ${baseClass}__stat--warning`}>
+          <a
+            href={`/admin/collections/members?where[and][0][status][equals]=active&where[and][1][renewalDate][less_than]=${encodeURIComponent(now)}`}
+            className={`${baseClass}__stat ${baseClass}__stat--warning`}
+          >
             <span className={`${baseClass}__stat-value`}>{overdueCount.totalDocs}</span>
             <span className={`${baseClass}__stat-label`}>Overdue</span>
           </a>
@@ -185,6 +207,15 @@ const BeforeDashboard: React.FC = async () => {
           + New Page
         </a>
       </div>
+
+      <MemberOnboardingPanel
+        tiers={tierBreakdown.docs.map((tier) => ({ id: tier.id, name: tier.name }))}
+        organizations={organizationContacts.docs.map((contact) => ({
+          id: contact.id,
+          name: contact.name,
+        }))}
+        people={personContacts.docs.map((contact) => ({ id: contact.id, name: contact.name }))}
+      />
 
       {/* Content panels */}
       <div className={`${baseClass}__panels`}>

@@ -238,6 +238,7 @@ export interface Page {
     | MediaBlock
     | ArchiveBlock
     | FormBlock
+    | MapEmbedBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1503,6 +1504,44 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapEmbedBlock".
+ */
+export interface MapEmbedBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Address shown above/alongside the map.
+   */
+  address: string;
+  /**
+   * Latitude coordinate.
+   */
+  latitude: number;
+  /**
+   * Longitude coordinate.
+   */
+  longitude: number;
+  /**
+   * Map zoom level (1-20).
+   */
+  zoom: number;
+  /**
+   * Optional short text shown beside the map (hours, directions, parking notes).
+   */
+  overlayText?: string | null;
+  height?: ('320' | '420' | '520') | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mapEmbed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -2250,6 +2289,7 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        mapEmbed?: T | MapEmbedBlockSelect<T>;
       };
   meta?:
     | T
@@ -2632,6 +2672,22 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MapEmbedBlock_select".
+ */
+export interface MapEmbedBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  address?: T;
+  latitude?: T;
+  longitude?: T;
+  zoom?: T;
+  overlayText?: T;
+  height?: T;
+  background?: T;
   id?: T;
   blockName?: T;
 }
