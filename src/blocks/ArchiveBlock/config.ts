@@ -10,6 +10,10 @@ import {
 export const Archive: Block = {
   slug: 'archive',
   interfaceName: 'ArchiveBlock',
+  labels: {
+    singular: 'Archive',
+    plural: 'Archives',
+  },
   fields: [
     {
       name: 'introContent',
@@ -87,8 +91,4 @@ export const Archive: Block = {
       relationTo: ['posts'],
     },
   ],
-  labels: {
-    plural: 'Archives',
-    singular: 'Archive',
-  },
 }

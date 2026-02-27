@@ -4,10 +4,15 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { AuditLog } from './collections/AuditLog'
 import { Categories } from './collections/Categories'
+import { Contacts } from './collections/Contacts'
 import { EventTemplates } from './collections/EventTemplates'
 import { Events } from './collections/Events'
 import { Media } from './collections/Media'
+import { Members } from './collections/Members'
+import { MembershipTiers } from './collections/MembershipTiers'
+import { Orders } from './collections/Orders'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Team } from './collections/Team'
@@ -66,7 +71,21 @@ export default buildConfig({
       url: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Pages, Posts, Events, EventTemplates, Team, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    Events,
+    EventTemplates,
+    Team,
+    Media,
+    Categories,
+    Contacts,
+    Members,
+    MembershipTiers,
+    Orders,
+    AuditLog,
+    Users,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
   plugins,

@@ -40,6 +40,14 @@ const getPagesSitemap = unstable_cache(
         loc: `${SITE_URL}/posts`,
         lastmod: dateFallback,
       },
+      {
+        loc: `${SITE_URL}/news`,
+        lastmod: dateFallback,
+      },
+      {
+        loc: `${SITE_URL}/events`,
+        lastmod: dateFallback,
+      },
     ]
 
     const sitemap = results.docs

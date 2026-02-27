@@ -1,0 +1,4 @@
+/* Fix descender clipping on document title (Payload's styles clip g, y, p, q) */
+.doc-header__title.render-title {
+  padding-bottom: calc(var(--base) * 0.4) !important;
+}

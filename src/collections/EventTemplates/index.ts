@@ -1,5 +1,7 @@
 import type { Access, CollectionConfig } from 'payload'
 
+import { currencyField } from '../../fields/currencyField'
+
 const adminOrStaffOrAuthenticatedFallback: Access = ({ req: { user } }) => {
   if (!user) return false
 
@@ -21,6 +23,7 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
     update: adminOrStaffOrAuthenticatedFallback,
   },
   admin: {
+    group: 'Events',
     defaultColumns: ['seriesName', 'defaultLocation', 'defaultIsChambersEvent', 'updatedAt'],
     useAsTitle: 'seriesName',
   },
@@ -29,6 +32,9 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
       name: 'seriesName',
       type: 'text',
       required: true,
+      admin: {
+        description: 'A name for this recurring event series (e.g., "Monthly Luncheon", "AGM").',
+      },
     },
     {
       name: 'defaultDescription',
@@ -87,12 +93,11 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
           name: 'description',
           type: 'textarea',
         },
-        {
-          name: 'priceCents',
-          type: 'number',
-          min: 0,
+        currencyField({
+          name: 'price',
           required: true,
-        },
+          description: 'Default ticket price. Enter in dollars (stored in minor units internally).',
+        }),
         {
           name: 'capacity',
           type: 'number',
@@ -124,6 +129,7 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
       type: 'group',
       admin: {
         condition: (_, siblingData) => siblingData.defaultTicketingType === 'chamber-managed',
+        description: 'Default service fee applied to events created from this template.',
       },
       fields: [
         {

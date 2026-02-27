@@ -12,6 +12,10 @@ import { linkGroup } from '../../fields/linkGroup'
 export const CallToAction: Block = {
   slug: 'cta',
   interfaceName: 'CallToActionBlock',
+  labels: {
+    singular: 'Call to Action',
+    plural: 'Calls to Action',
+  },
   fields: [
     {
       name: 'richText',
@@ -35,8 +39,4 @@ export const CallToAction: Block = {
       },
     }),
   ],
-  labels: {
-    plural: 'Calls to Action',
-    singular: 'Call to Action',
-  },
 }

@@ -1,24 +1,178 @@
 @import '~@payloadcms/ui/scss';
 
-.dashboard .before-dashboard {
-  margin-bottom: base(1.5);
+.chamber-dashboard {
+  margin-bottom: base(2);
+  padding: base(1.5);
+  background: var(--theme-elevation-50);
+  border-radius: var(--style-radius-m);
+  border: 1px solid var(--theme-elevation-150);
 
-  &__banner {
-    & h4 {
+  &__header {
+    margin-bottom: base(1);
+
+    h2 {
+      margin: 0 0 base(0.25);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--theme-text);
+    }
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: var(--theme-elevation-500);
+    font-size: 16px;
+  }
+
+  // ── Stats row ──────────────────────────────────────────────
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: base(0.75);
+    margin-bottom: base(1);
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: base(0.75) base(0.5);
+    background: var(--theme-elevation-0);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--style-radius-s);
+    text-decoration: none;
+    transition: border-color 150ms ease;
+
+    &:hover {
+      border-color: var(--theme-elevation-300);
+    }
+  }
+
+  &__stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--theme-text);
+    margin-bottom: base(0.25);
+  }
+
+  &__stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--theme-elevation-500);
+  }
+
+  // ── Quick actions ──────────────────────────────────────────
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: base(0.5);
+    margin-bottom: base(1.25);
+  }
+
+  &__action {
+    display: inline-flex;
+    align-items: center;
+    padding: base(0.35) base(0.75);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--theme-text);
+    background: var(--theme-elevation-0);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--style-radius-s);
+    text-decoration: none;
+    transition: background 150ms ease, border-color 150ms ease;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      border-color: var(--theme-elevation-300);
+    }
+  }
+
+  // ── Content panels ─────────────────────────────────────────
+  &__panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: base(1);
+  }
+
+  &__panel {
+    background: var(--theme-elevation-0);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--style-radius-s);
+    overflow: hidden;
+  }
+
+  &__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: base(0.6) base(0.75);
+    border-bottom: 1px solid var(--theme-elevation-100);
+
+    h3 {
       margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--theme-text);
     }
   }
 
-  &__instructions {
-    list-style: decimal;
-    margin-bottom: base(0.5);
+  &__view-all {
+    font-size: 14px;
+    color: var(--theme-elevation-500);
+    text-decoration: none;
 
-    & li {
-      width: 100%;
+    &:hover {
+      color: var(--theme-text);
     }
   }
 
-  & a:hover {
-    opacity: 0.85;
+  &__empty {
+    padding: base(1);
+    text-align: center;
+    color: var(--theme-elevation-400);
+    font-size: 15px;
+    margin: 0;
+  }
+
+  // ── Lists ──────────────────────────────────────────────────
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__list-item {
+    border-bottom: 1px solid var(--theme-elevation-75);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    a {
+      display: flex;
+      flex-direction: column;
+      gap: base(0.15);
+      padding: base(0.5) base(0.75);
+      text-decoration: none;
+      transition: background 150ms ease;
+
+      &:hover {
+        background: var(--theme-elevation-50);
+      }
+    }
+  }
+
+  &__list-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--theme-text);
+  }
+
+  &__list-meta {
+    font-size: 13px;
+    color: var(--theme-elevation-450);
   }
 }

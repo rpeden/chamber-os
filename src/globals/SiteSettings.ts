@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 
+import { CURRENCIES, DEFAULT_CURRENCY_CODE } from '@/lib/currency'
 import { FONT_OPTIONS } from '@/lib/theme'
 import { revalidateTag } from 'next/cache'
 import type { PayloadRequest } from 'payload'
@@ -66,6 +67,20 @@ export const SiteSettings: GlobalConfig = {
               type: 'text',
               admin: {
                 description: 'A short tagline shown below the logo or in the hero area.',
+              },
+            },
+            {
+              name: 'currency',
+              type: 'select',
+              required: true,
+              defaultValue: DEFAULT_CURRENCY_CODE,
+              options: Object.values(CURRENCIES).map((c) => ({
+                label: `${c.name} (${c.code})`,
+                value: c.code,
+              })),
+              admin: {
+                description:
+                  'Currency used for all pricing — membership tiers, event tickets, etc. All amounts are stored in minor units (e.g., cents) and displayed in the chosen currency.',
               },
             },
           ],

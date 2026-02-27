@@ -48,6 +48,7 @@ export const Pages: CollectionConfig<'pages'> = {
     slug: true,
   },
   admin: {
+    group: 'Content',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
@@ -84,22 +85,25 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
-                CallToAction,
+                // Most-used layout blocks
                 Content,
-                MediaBlock,
-                Archive,
-                FormBlock,
-                TextColumns,
-                CardGrid,
-                IconGrid,
                 ImageText,
+                CardGrid,
+                TextColumns,
+                CallToAction,
                 CtaBanner,
-                StatsBar,
-                MixedContentRow,
+                // Specialized content
                 EventsList,
                 NewsFeed,
                 Testimonials,
                 SponsorsGrid,
+                StatsBar,
+                IconGrid,
+                MixedContentRow,
+                // Utility
+                MediaBlock,
+                Archive,
+                FormBlock,
               ],
               required: true,
               admin: {

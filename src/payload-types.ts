@@ -74,6 +74,11 @@ export interface Config {
     team: Team;
     media: Media;
     categories: Category;
+    contacts: Contact;
+    members: Member;
+    'membership-tiers': MembershipTier;
+    orders: Order;
+    'audit-log': AuditLog;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -99,6 +104,11 @@ export interface Config {
     team: TeamSelect<false> | TeamSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    members: MembersSelect<false> | MembersSelect<true>;
+    'membership-tiers': MembershipTiersSelect<false> | MembershipTiersSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -211,22 +221,22 @@ export interface Page {
       | null;
   };
   layout: (
-    | CallToActionBlock
     | ContentBlock
-    | MediaBlock
-    | ArchiveBlock
-    | FormBlock
-    | TextColumnsBlock
-    | CardGridBlock
-    | IconGridBlock
     | ImageTextBlock
+    | CardGridBlock
+    | TextColumnsBlock
+    | CallToActionBlock
     | CtaBannerBlock
-    | StatsBarBlock
-    | MixedContentRowBlock
     | EventsListBlock
     | NewsFeedBlock
     | TestimonialsBlock
     | SponsorsGridBlock
+    | StatsBarBlock
+    | IconGridBlock
+    | MixedContentRowBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
   )[];
   meta?: {
     title?: string | null;
@@ -252,6 +262,9 @@ export interface Page {
  */
 export interface Media {
   id: number;
+  /**
+   * Describe the image for screen readers and SEO (e.g., "Board members at the 2025 gala").
+   */
   alt?: string | null;
   caption?: {
     root: {
@@ -372,6 +385,9 @@ export interface FolderInterface {
 export interface Post {
   id: number;
   title: string;
+  /**
+   * Main image displayed at the top of the post.
+   */
   heroImage?: (number | null) | Media;
   content: {
     root: {
@@ -467,6 +483,216 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentBlock".
+ */
+export interface ContentBlock {
+  columns?:
+    | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+          /**
+           * Choose how the link should be rendered.
+           */
+          appearance?: ('default' | 'outline') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  layout: 'imageLeft' | 'imageRight';
+  image: number | Media;
+  heading?: string | null;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  enableCta?: boolean | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline') | null;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardGridBlock".
+ */
+export interface CardGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Number of columns on desktop. Stacks to fewer columns on smaller screens.
+   */
+  columns: '2' | '3' | '4';
+  /**
+   * Add cards to the grid
+   */
+  cards?:
+    | {
+        /**
+         * Card image — displayed at the top of the card
+         */
+        image?: (number | null) | Media;
+        heading: string;
+        body?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cardGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextColumnsBlock".
+ */
+export interface TextColumnsBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Controls the column layout. On mobile, all layouts stack to a single column.
+   */
+  layout: 'oneColumn' | 'twoEqual' | 'twoWideLeft' | 'twoWideRight' | 'threeEqual' | 'fourEqual';
+  /**
+   * Add up to 4 columns of rich text content
+   */
+  columns?:
+    | {
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textColumns';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
@@ -515,12 +741,374 @@ export interface CallToActionBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
+ * via the `definition` "CtaBannerBlock".
  */
-export interface ContentBlock {
-  columns?:
+export interface CtaBannerBlock {
+  heading: string;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  link: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Choose how the link should be rendered.
+     */
+    appearance?: ('default' | 'outline') | null;
+  };
+  /**
+   * Visual style of the CTA button
+   */
+  ctaVariant?: ('primary' | 'secondary' | 'accent' | 'outline') | null;
+  /**
+   * Optional background image — will display with a dark overlay for text readability
+   */
+  backgroundImage?: (number | null) | Media;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ctaBanner';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventsListBlock".
+ */
+export interface EventsListBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Optional short paragraph below the heading
+   */
+  introText?: string | null;
+  /**
+   * Featured: only events marked as featured. Upcoming: future events by date. All: everything published.
+   */
+  displayMode: 'featured' | 'upcoming' | 'all';
+  /**
+   * Maximum number of events to display (1–12)
+   */
+  maxItems?: number | null;
+  enableViewAllLink?: boolean | null;
+  /**
+   * Link to the full events listing page
+   */
+  viewAllLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'eventsList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsFeedBlock".
+ */
+export interface NewsFeedBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Optional short paragraph below the heading
+   */
+  introText?: string | null;
+  /**
+   * Maximum number of posts to display (1–12)
+   */
+  maxItems?: number | null;
+  /**
+   * Optional: only show posts from these categories. Leave empty to show all categories.
+   */
+  categoryFilter?: (number | Category)[] | null;
+  enableViewAllLink?: boolean | null;
+  /**
+   * Link to the full news/blog listing page
+   */
+  viewAllLink?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'newsFeed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock".
+ */
+export interface TestimonialsBlock {
+  /**
+   * Optional heading above the testimonials carousel
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add testimonials — each one appears as a slide in the carousel
+   */
+  testimonials?:
     | {
-        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        /**
+         * A short, punchy excerpt displayed large — the "headline" of the testimonial
+         */
+        pullquote: string;
+        /**
+         * The complete testimonial text
+         */
+        fullQuote: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Name of the person giving the testimonial
+         */
+        attributionName: string;
+        /**
+         * Organization, title, or role — e.g., "Owner, Hudson Bay Trading Post"
+         */
+        attributionOrg?: string | null;
+        /**
+         * Optional headshot photo
+         */
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Automatically cycle through testimonials every 8 seconds
+   */
+  autoAdvance?: boolean | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SponsorsGridBlock".
+ */
+export interface SponsorsGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add sponsor tiers — e.g., "Pillar Partners", "Gold Sponsors"
+   */
+  tiers?:
+    | {
+        /**
+         * Heading shown above this row of logos
+         */
+        tierName: string;
+        /**
+         * Grid shows all logos at once. Carousel lets you scroll through them with arrows.
+         */
+        displayMode: 'grid' | 'carousel';
+        /**
+         * Add sponsor logos with optional links to their websites
+         */
+        logos?:
+          | {
+              logo: number | Media;
+              /**
+               * Used for alt text and hover tooltip
+               */
+              sponsorName?: string | null;
+              /**
+               * Link to the sponsor's website (opens in new tab)
+               */
+              url?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'sponsorsGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBarBlock".
+ */
+export interface StatsBarBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Add 2–6 statistics to display in a row
+   */
+  stats?:
+    | {
+        /**
+         * The stat value — e.g., "500+", "$2M", "25 Years"
+         */
+        number: string;
+        /**
+         * Label below the number — e.g., "Active Members", "Raised Annually"
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'statsBar';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconGridBlock".
+ */
+export interface IconGridBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  columns: '2' | '3' | '4';
+  items?:
+    | {
+        /**
+         * Icon image — SVG recommended, displayed at 48×48px
+         */
+        icon: number | Media;
+        /**
+         * Small text above the heading (e.g., "Step 1", "Networking")
+         */
+        overline?: string | null;
+        heading: string;
+        /**
+         * Short description — plain text, not rich text
+         */
+        body?: string | null;
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: number | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: number | Post;
+              } | null);
+          url?: string | null;
+          label: string;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iconGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MixedContentRowBlock".
+ */
+export interface MixedContentRowBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Vertical alignment of slot contents when heights differ
+   */
+  verticalAlignment?: ('top' | 'center' | 'bottom') | null;
+  /**
+   * Add 1–4 content slots. Column widths should add up to a sensible total.
+   */
+  slots?:
+    | {
+        width: 'quarter' | 'third' | 'half' | 'twoThirds' | 'threeQuarters' | 'full';
+        contentType: 'richText' | 'image' | 'cta';
         richText?: {
           root: {
             type: string;
@@ -536,7 +1124,9 @@ export interface ContentBlock {
           };
           [k: string]: unknown;
         } | null;
-        enableLink?: boolean | null;
+        image?: (number | null) | Media;
+        ctaHeading?: string | null;
+        ctaBody?: string | null;
         link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
@@ -559,9 +1149,13 @@ export interface ContentBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'content';
+  blockType: 'mixedContentRow';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -809,584 +1403,6 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TextColumnsBlock".
- */
-export interface TextColumnsBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Controls the column layout. On mobile, all layouts stack to a single column.
-   */
-  layout: 'oneColumn' | 'twoEqual' | 'twoWideLeft' | 'twoWideRight' | 'threeEqual' | 'fourEqual';
-  /**
-   * Add up to 4 columns of rich text content
-   */
-  columns?:
-    | {
-        richText: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'textColumns';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CardGridBlock".
- */
-export interface CardGridBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Number of columns on desktop. Stacks to fewer columns on smaller screens.
-   */
-  columns: '2' | '3' | '4';
-  /**
-   * Add cards to the grid
-   */
-  cards?:
-    | {
-        /**
-         * Card image — displayed at the top of the card
-         */
-        image?: (number | null) | Media;
-        heading: string;
-        body?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'cardGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "IconGridBlock".
- */
-export interface IconGridBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  columns: '2' | '3' | '4';
-  items?:
-    | {
-        /**
-         * Icon image — SVG recommended, displayed at 48×48px
-         */
-        icon: number | Media;
-        /**
-         * Small text above the heading (e.g., "Step 1", "Networking")
-         */
-        overline?: string | null;
-        heading: string;
-        /**
-         * Short description — plain text, not rich text
-         */
-        body?: string | null;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'iconGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ImageTextBlock".
- */
-export interface ImageTextBlock {
-  layout: 'imageLeft' | 'imageRight';
-  image: number | Media;
-  heading?: string | null;
-  body: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  enableCta?: boolean | null;
-  link?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-    /**
-     * Choose how the link should be rendered.
-     */
-    appearance?: ('default' | 'outline') | null;
-  };
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'imageText';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CtaBannerBlock".
- */
-export interface CtaBannerBlock {
-  heading: string;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  link: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-    /**
-     * Choose how the link should be rendered.
-     */
-    appearance?: ('default' | 'outline') | null;
-  };
-  /**
-   * Visual style of the CTA button
-   */
-  ctaVariant?: ('primary' | 'secondary' | 'accent' | 'outline') | null;
-  /**
-   * Optional background image — will display with a dark overlay for text readability
-   */
-  backgroundImage?: (number | null) | Media;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'ctaBanner';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatsBarBlock".
- */
-export interface StatsBarBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Add 2–6 statistics to display in a row
-   */
-  stats?:
-    | {
-        /**
-         * The stat value — e.g., "500+", "$2M", "25 Years"
-         */
-        number: string;
-        /**
-         * Label below the number — e.g., "Active Members", "Raised Annually"
-         */
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'statsBar';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MixedContentRowBlock".
- */
-export interface MixedContentRowBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Vertical alignment of slot contents when heights differ
-   */
-  verticalAlignment?: ('top' | 'center' | 'bottom') | null;
-  /**
-   * Add 1–4 content slots. Column widths should add up to a sensible total.
-   */
-  slots?:
-    | {
-        width: 'quarter' | 'third' | 'half' | 'twoThirds' | 'threeQuarters' | 'full';
-        contentType: 'richText' | 'image' | 'cta';
-        richText?: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        } | null;
-        image?: (number | null) | Media;
-        ctaHeading?: string | null;
-        ctaBody?: string | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('default' | 'outline') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mixedContentRow';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "EventsListBlock".
- */
-export interface EventsListBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Optional short paragraph below the heading
-   */
-  introText?: string | null;
-  /**
-   * Featured: only events marked as featured. Upcoming: future events by date. All: everything published.
-   */
-  displayMode: 'featured' | 'upcoming' | 'all';
-  /**
-   * Maximum number of events to display (1–12)
-   */
-  maxItems?: number | null;
-  enableViewAllLink?: boolean | null;
-  /**
-   * Link to the full events listing page
-   */
-  viewAllLink?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-  };
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'eventsList';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "NewsFeedBlock".
- */
-export interface NewsFeedBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Optional short paragraph below the heading
-   */
-  introText?: string | null;
-  /**
-   * Maximum number of posts to display (1–12)
-   */
-  maxItems?: number | null;
-  /**
-   * Optional: only show posts from these categories. Leave empty to show all categories.
-   */
-  categoryFilter?: (number | Category)[] | null;
-  enableViewAllLink?: boolean | null;
-  /**
-   * Link to the full news/blog listing page
-   */
-  viewAllLink?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-  };
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'newsFeed';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TestimonialsBlock".
- */
-export interface TestimonialsBlock {
-  /**
-   * Optional heading above the testimonials carousel
-   */
-  sectionHeading?: string | null;
-  /**
-   * Add testimonials — each one appears as a slide in the carousel
-   */
-  testimonials?:
-    | {
-        /**
-         * A short, punchy excerpt displayed large — the "headline" of the testimonial
-         */
-        pullquote: string;
-        /**
-         * The complete testimonial text
-         */
-        fullQuote: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        /**
-         * Name of the person giving the testimonial
-         */
-        attributionName: string;
-        /**
-         * Organization, title, or role — e.g., "Owner, Hudson Bay Trading Post"
-         */
-        attributionOrg?: string | null;
-        /**
-         * Optional headshot photo
-         */
-        photo?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Automatically cycle through testimonials every 8 seconds
-   */
-  autoAdvance?: boolean | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'testimonials';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "SponsorsGridBlock".
- */
-export interface SponsorsGridBlock {
-  /**
-   * Optional heading displayed above this section
-   */
-  sectionHeading?: string | null;
-  /**
-   * Add sponsor tiers — e.g., "Pillar Partners", "Gold Sponsors"
-   */
-  tiers?:
-    | {
-        /**
-         * Heading shown above this row of logos
-         */
-        tierName: string;
-        /**
-         * Grid shows all logos at once. Carousel lets you scroll through them with arrows.
-         */
-        displayMode: 'grid' | 'carousel';
-        /**
-         * Add sponsor logos with optional links to their websites
-         */
-        logos?:
-          | {
-              logo: number | Media;
-              /**
-               * Used for alt text and hover tooltip
-               */
-              sponsorName?: string | null;
-              /**
-               * Link to the sponsor's website (opens in new tab)
-               */
-              url?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Background color for this section
-   */
-  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'sponsorsGrid';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -1415,9 +1431,18 @@ export interface Event {
   startDate: string;
   endDate: string;
   featuredImage?: (number | null) | Media;
+  /**
+   * Featured events appear prominently on the homepage and events page.
+   */
   isFeatured?: boolean | null;
+  /**
+   * Uncheck for partner or community events hosted by other organizations.
+   */
   isChambersEvent?: boolean | null;
   status: 'draft' | 'published' | 'cancelled';
+  /**
+   * Choose how tickets are handled: no ticketing, link to an external site, or manage sales directly through the platform.
+   */
   ticketingType: 'none' | 'external-link' | 'chamber-managed';
   /**
    * Use when ticket sales are handled on another platform.
@@ -1427,13 +1452,19 @@ export interface Event {
     | {
         name: string;
         description?: string | null;
-        priceCents: number;
+        /**
+         * Ticket price. Enter in dollars (stored in minor units internally).
+         */
+        price: number;
         capacity: number;
         saleStart?: string | null;
         saleEnd?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * A small fee added to each ticket to cover platform costs. Leave as "None" if you don't want to charge extra.
+   */
   serviceFee?: {
     feeType: 'none' | 'flat' | 'percentage';
     feeAmount?: number | null;
@@ -1452,6 +1483,9 @@ export interface Event {
  */
 export interface EventTemplate {
   id: number;
+  /**
+   * A name for this recurring event series (e.g., "Monthly Luncheon", "AGM").
+   */
   seriesName: string;
   defaultDescription?: {
     root: {
@@ -1476,13 +1510,19 @@ export interface EventTemplate {
     | {
         name: string;
         description?: string | null;
-        priceCents: number;
+        /**
+         * Default ticket price. Enter in dollars (stored in minor units internally).
+         */
+        price: number;
         capacity: number;
         saleStart?: string | null;
         saleEnd?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Default service fee applied to events created from this template.
+   */
   defaultServiceFee?: {
     feeType: 'none' | 'flat' | 'percentage';
     feeAmount?: number | null;
@@ -1516,10 +1556,283 @@ export interface Team {
   } | null;
   headshot?: (number | null) | Media;
   type: 'staff' | 'board';
+  /**
+   * Lower numbers appear first. Use this to control the order staff and board members are shown.
+   */
   displayOrder: number;
   email?: string | null;
+  /**
+   * Full LinkedIn profile URL (e.g., https://linkedin.com/in/janedoe).
+   */
   linkedin?: string | null;
   status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  /**
+   * Full name of the person, or the organization name.
+   */
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  /**
+   * Is this contact a person or an organization? Members can be either type.
+   */
+  type: 'person' | 'organization';
+  /**
+   * If this person belongs to an organization, link the org Contact here.
+   */
+  organization?: (number | null) | Contact;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    province?: string | null;
+    postalCode?: string | null;
+  };
+  /**
+   * Flexible tags for categorizing contacts (e.g., vendor, municipal, media, prospect).
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Full URL including https://
+   */
+  website?: string | null;
+  socialLinks?: {
+    facebook?: string | null;
+    linkedin?: string | null;
+    instagram?: string | null;
+    x?: string | null;
+  };
+  /**
+   * Internal notes about this contact. Not shown publicly.
+   */
+  notes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members".
+ */
+export interface Member {
+  id: number;
+  /**
+   * The entity that IS the member — an organization or a person Contact.
+   */
+  contact: number | Contact;
+  /**
+   * The go-to human for this membership. Used when the member is an organization — link the main contact person here.
+   */
+  primaryContact?: (number | null) | Contact;
+  /**
+   * The membership tier this member is subscribed to.
+   */
+  membershipTier?: (number | null) | MembershipTier;
+  /**
+   * Membership status. In production, transitions should go through MembershipService for audit logging.
+   */
+  status: 'pending' | 'active' | 'lapsed' | 'cancelled' | 'reinstated';
+  /**
+   * Date the membership began.
+   */
+  joinedDate?: string | null;
+  /**
+   * Next renewal date for this membership.
+   */
+  renewalDate?: string | null;
+  /**
+   * Stripe Customer ID for billing integration.
+   */
+  stripeCustomerId?: string | null;
+  /**
+   * Xero Contact ID for accounting sync. Lives on the Member (the billable entity), not the Contact.
+   */
+  xeroContactId?: string | null;
+  /**
+   * Internal notes about this membership. Not visible to the member.
+   */
+  notes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-tiers".
+ */
+export interface MembershipTier {
+  id: number;
+  /**
+   * Tier name shown publicly (e.g., "Gold", "Platinum").
+   */
+  name: string;
+  /**
+   * Annual membership price. Enter in dollars (stored in minor units internally).
+   */
+  annualPrice: number;
+  /**
+   * Detailed tier description for the public-facing pricing page.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * List of features/benefits included in this tier.
+   */
+  features?:
+    | {
+        feature: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Controls the order tiers appear on the pricing page. Lower numbers appear first.
+   */
+  displayOrder?: number | null;
+  /**
+   * Stripe Price ID for automated billing. Leave blank until Stripe integration is configured.
+   */
+  stripePriceId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  /**
+   * Full name of the person who made the purchase.
+   */
+  purchaserName: string;
+  /**
+   * Email for order confirmation and ticket delivery.
+   */
+  purchaserEmail: string;
+  event: number | Event;
+  /**
+   * The ticket type identifier (matches ticketTypes.name on the event).
+   */
+  ticketType: string;
+  quantity: number;
+  /**
+   * Optional link to a Contact record. Allows tracking purchase history for known contacts. Null for guest checkouts.
+   */
+  contact?: (number | null) | Contact;
+  /**
+   * Stripe Payment Intent ID. Indexed for idempotent webhook processing.
+   */
+  stripePaymentIntentId?: string | null;
+  /**
+   * Total charged amount (ticket price × quantity + service fee). Stored in minor units.
+   */
+  totalAmount?: number | null;
+  /**
+   * Service fee amount, tracked separately for reporting. Stored in minor units.
+   */
+  serviceFeeAmount?: number | null;
+  /**
+   * Order status. Follows the state machine: pending → confirmed → refunded. In production, transitions go through OrderService (ADR-6).
+   */
+  status: 'pending' | 'confirmed' | 'refunded';
+  /**
+   * Auto-generated token for QR code ticket validation. Created when order is confirmed.
+   */
+  qrToken?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  entityType: 'member' | 'order' | 'payment' | 'contact';
+  /**
+   * ID of the entity this log entry relates to.
+   */
+  entityId: string;
+  /**
+   * What happened — e.g., "status_changed", "tier_upgraded", "payment_succeeded".
+   */
+  action: string;
+  /**
+   * Previous state (if applicable).
+   */
+  fromState?: string | null;
+  /**
+   * New state (if applicable).
+   */
+  toState?: string | null;
+  /**
+   * Who triggered this — staff user ID, Contact ID, "system", or "webhook".
+   */
+  actorId?: string | null;
+  actorType: 'staff' | 'member' | 'system' | 'webhook';
+  /**
+   * Additional context as JSON (e.g., reason for override, payment details).
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1742,6 +2055,26 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'contacts';
+        value: number | Contact;
+      } | null)
+    | ({
+        relationTo: 'members';
+        value: number | Member;
+      } | null)
+    | ({
+        relationTo: 'membership-tiers';
+        value: number | MembershipTier;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
@@ -1841,22 +2174,22 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
-        mediaBlock?: T | MediaBlockSelect<T>;
-        archive?: T | ArchiveBlockSelect<T>;
-        formBlock?: T | FormBlockSelect<T>;
-        textColumns?: T | TextColumnsBlockSelect<T>;
-        cardGrid?: T | CardGridBlockSelect<T>;
-        iconGrid?: T | IconGridBlockSelect<T>;
         imageText?: T | ImageTextBlockSelect<T>;
+        cardGrid?: T | CardGridBlockSelect<T>;
+        textColumns?: T | TextColumnsBlockSelect<T>;
+        cta?: T | CallToActionBlockSelect<T>;
         ctaBanner?: T | CtaBannerBlockSelect<T>;
-        statsBar?: T | StatsBarBlockSelect<T>;
-        mixedContentRow?: T | MixedContentRowBlockSelect<T>;
         eventsList?: T | EventsListBlockSelect<T>;
         newsFeed?: T | NewsFeedBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
         sponsorsGrid?: T | SponsorsGridBlockSelect<T>;
+        statsBar?: T | StatsBarBlockSelect<T>;
+        iconGrid?: T | IconGridBlockSelect<T>;
+        mixedContentRow?: T | MixedContentRowBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+        archive?: T | ArchiveBlockSelect<T>;
+        formBlock?: T | FormBlockSelect<T>;
       };
   meta?:
     | T
@@ -1871,30 +2204,6 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock_select".
- */
-export interface CallToActionBlockSelect<T extends boolean = true> {
-  richText?: T;
-  links?:
-    | T
-    | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
-        id?: T;
-      };
-  id?: T;
-  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1924,50 +2233,23 @@ export interface ContentBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock_select".
+ * via the `definition` "ImageTextBlock_select".
  */
-export interface MediaBlockSelect<T extends boolean = true> {
-  media?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock_select".
- */
-export interface ArchiveBlockSelect<T extends boolean = true> {
-  introContent?: T;
-  populateBy?: T;
-  relationTo?: T;
-  categories?: T;
-  limit?: T;
-  selectedDocs?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
- */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TextColumnsBlock_select".
- */
-export interface TextColumnsBlockSelect<T extends boolean = true> {
-  sectionHeading?: T;
+export interface ImageTextBlockSelect<T extends boolean = true> {
   layout?: T;
-  columns?:
+  image?: T;
+  heading?: T;
+  body?: T;
+  enableCta?: T;
+  link?:
     | T
     | {
-        richText?: T;
-        id?: T;
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+        appearance?: T;
       };
   background?: T;
   id?: T;
@@ -2004,28 +2286,15 @@ export interface CardGridBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "IconGridBlock_select".
+ * via the `definition` "TextColumnsBlock_select".
  */
-export interface IconGridBlockSelect<T extends boolean = true> {
+export interface TextColumnsBlockSelect<T extends boolean = true> {
   sectionHeading?: T;
-  columns?: T;
-  items?:
+  layout?: T;
+  columns?:
     | T
     | {
-        icon?: T;
-        overline?: T;
-        heading?: T;
-        body?: T;
-        enableLink?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
+        richText?: T;
         id?: T;
       };
   background?: T;
@@ -2034,25 +2303,25 @@ export interface IconGridBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ImageTextBlock_select".
+ * via the `definition` "CallToActionBlock_select".
  */
-export interface ImageTextBlockSelect<T extends boolean = true> {
-  layout?: T;
-  image?: T;
-  heading?: T;
-  body?: T;
-  enableCta?: T;
-  link?:
+export interface CallToActionBlockSelect<T extends boolean = true> {
+  richText?: T;
+  links?:
     | T
     | {
-        type?: T;
-        newTab?: T;
-        reference?: T;
-        url?: T;
-        label?: T;
-        appearance?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
       };
-  background?: T;
   id?: T;
   blockName?: T;
 }
@@ -2075,55 +2344,6 @@ export interface CtaBannerBlockSelect<T extends boolean = true> {
       };
   ctaVariant?: T;
   backgroundImage?: T;
-  background?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "StatsBarBlock_select".
- */
-export interface StatsBarBlockSelect<T extends boolean = true> {
-  sectionHeading?: T;
-  stats?:
-    | T
-    | {
-        number?: T;
-        label?: T;
-        id?: T;
-      };
-  background?: T;
-  id?: T;
-  blockName?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MixedContentRowBlock_select".
- */
-export interface MixedContentRowBlockSelect<T extends boolean = true> {
-  sectionHeading?: T;
-  verticalAlignment?: T;
-  slots?:
-    | T
-    | {
-        width?: T;
-        contentType?: T;
-        richText?: T;
-        image?: T;
-        ctaHeading?: T;
-        ctaBody?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
-        id?: T;
-      };
   background?: T;
   id?: T;
   blockName?: T;
@@ -2222,6 +2442,119 @@ export interface SponsorsGridBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBarBlock_select".
+ */
+export interface StatsBarBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  stats?:
+    | T
+    | {
+        number?: T;
+        label?: T;
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IconGridBlock_select".
+ */
+export interface IconGridBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  columns?: T;
+  items?:
+    | T
+    | {
+        icon?: T;
+        overline?: T;
+        heading?: T;
+        body?: T;
+        enableLink?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MixedContentRowBlock_select".
+ */
+export interface MixedContentRowBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  verticalAlignment?: T;
+  slots?:
+    | T
+    | {
+        width?: T;
+        contentType?: T;
+        richText?: T;
+        image?: T;
+        ctaHeading?: T;
+        ctaBody?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+              appearance?: T;
+            };
+        id?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock_select".
+ */
+export interface MediaBlockSelect<T extends boolean = true> {
+  media?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock_select".
+ */
+export interface ArchiveBlockSelect<T extends boolean = true> {
+  introContent?: T;
+  populateBy?: T;
+  relationTo?: T;
+  categories?: T;
+  limit?: T;
+  selectedDocs?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  form?: T;
+  enableIntro?: T;
+  introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -2273,7 +2606,7 @@ export interface EventsSelect<T extends boolean = true> {
     | {
         name?: T;
         description?: T;
-        priceCents?: T;
+        price?: T;
         capacity?: T;
         saleStart?: T;
         saleEnd?: T;
@@ -2306,7 +2639,7 @@ export interface EventTemplatesSelect<T extends boolean = true> {
     | {
         name?: T;
         description?: T;
-        priceCents?: T;
+        price?: T;
         capacity?: T;
         saleStart?: T;
         saleEnd?: T;
@@ -2450,6 +2783,114 @@ export interface CategoriesSelect<T extends boolean = true> {
         label?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  type?: T;
+  organization?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        province?: T;
+        postalCode?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  website?: T;
+  socialLinks?:
+    | T
+    | {
+        facebook?: T;
+        linkedin?: T;
+        instagram?: T;
+        x?: T;
+      };
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members_select".
+ */
+export interface MembersSelect<T extends boolean = true> {
+  contact?: T;
+  primaryContact?: T;
+  membershipTier?: T;
+  status?: T;
+  joinedDate?: T;
+  renewalDate?: T;
+  stripeCustomerId?: T;
+  xeroContactId?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-tiers_select".
+ */
+export interface MembershipTiersSelect<T extends boolean = true> {
+  name?: T;
+  annualPrice?: T;
+  description?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  displayOrder?: T;
+  stripePriceId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  purchaserName?: T;
+  purchaserEmail?: T;
+  event?: T;
+  ticketType?: T;
+  quantity?: T;
+  contact?: T;
+  stripePaymentIntentId?: T;
+  totalAmount?: T;
+  serviceFeeAmount?: T;
+  status?: T;
+  qrToken?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  entityType?: T;
+  entityId?: T;
+  action?: T;
+  fromState?: T;
+  toState?: T;
+  actorId?: T;
+  actorType?: T;
+  metadata?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2918,6 +3359,10 @@ export interface SiteSetting {
    */
   tagline?: string | null;
   /**
+   * Currency used for all pricing — membership tiers, event tickets, etc. All amounts are stored in minor units (e.g., cents) and displayed in the chosen currency.
+   */
+  currency: 'CAD' | 'USD';
+  /**
    * Full mailing address. Line breaks are preserved.
    */
   address?: string | null;
@@ -3100,6 +3545,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
   logo?: T;
   tagline?: T;
+  currency?: T;
   address?: T;
   phone?: T;
   email?: T;

@@ -8,6 +8,7 @@ import RichText from '@/components/RichText'
 
 import { Media } from '@/components/Media'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { getServerSideURL } from '@/utilities/getURL'
 
 type Args = {
   params: Promise<{
@@ -52,8 +53,38 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   if (!event) return <PayloadRedirects url={url} />
 
+  const featuredImageUrl =
+    event.featuredImage && typeof event.featuredImage === 'object' && event.featuredImage.url
+      ? event.featuredImage.url
+      : undefined
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.title,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    location: {
+      '@type': 'Place',
+      name: event.location,
+    },
+    ...(featuredImageUrl ? { image: [featuredImageUrl] } : {}),
+    ...(event.ticketingType === 'external-link' && event.externalTicketUrl
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: event.externalTicketUrl,
+          },
+        }
+      : {}),
+  }
+
   return (
     <article className="pb-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PayloadRedirects disableNotFound url={url} />
 
       <section className="container pt-24 pb-8">
@@ -113,9 +144,23 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     }
   }
 
+  const ogImage =
+    event.featuredImage && typeof event.featuredImage === 'object' && event.featuredImage.url
+      ? { url: event.featuredImage.url }
+      : undefined
+
   return {
     title: `${event.title} | Events`,
-    description: `Details for ${event.title} at ${event.location}.`,
+    description: `${event.title} — ${formatDateRange(event.startDate, event.endDate)} at ${event.location}.`,
+    openGraph: {
+      title: event.title,
+      description: `${formatDateRange(event.startDate, event.endDate)} at ${event.location}`,
+      type: 'website',
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+    alternates: {
+      canonical: `${getServerSideURL()}/events/${slug}`,
+    },
   }
 }
 

@@ -2,6 +2,11 @@
 
 This is the work plan to get from the current Payload website template to a functioning Chamber OS MVP. Items are sequenced by dependency — earlier phases unblock later ones.
 
+> **⚠️ Phases 7+ involve business logic, CRM, and payments.** Before working on anything in Phase 7 or later, read these documents in order:
+> 1. **`ARCHITECTURE.md`** — Binding architectural decisions (Contact/Member split, service layer rules, auth model, order state machine). Non-negotiable.
+> 2. **`hold-the-fuck-up.md`** — The concerns that prompted the architecture decisions. Context for *why*.
+> 3. **`BRIEFING.md`** — Full project vision and data model details.
+
 ---
 
 ## Phase 0: Foundation & Cleanup
@@ -132,8 +137,8 @@ These collections feed the dynamic blocks (events-list, news-feed).
 - [x] **WF.1** Build Phase 6 dynamic blocks (`events-list`, `news-feed`, `testimonials`, `sponsors-grid`) and register them
 - [x] **WF.2** Build homepage composition target from Phase 12.1 using those blocks (OBOT-style section order)
 - [x] **WF.3** Replace template/demo seed with Chamber-oriented placeholder content (hero, homepage sections, events/news/testimonials/sponsors)
-- [ ] **WF.4** Frontend polish pass from Phase 12 (metadata, responsive QA, accessibility, performance baseline)
-- [ ] **WF.5** Only after WF.1–WF.4: resume admin CRM/member onboarding phases
+- [x] **WF.4** Frontend polish pass from Phase 12 (metadata, responsive QA, accessibility, performance baseline)
+- [x] **WF.5** Only after WF.1–WF.4: resume admin CRM/member onboarding phases
 
 These blocks pull from the collections defined in Phase 5.
 
@@ -160,71 +165,83 @@ These blocks pull from the collections defined in Phase 5.
 
 ---
 
+## Architecture Gate (Before Phase 7)
+
+**Stop.** Before writing any code for Phases 7–18, verify you have read and understood `ARCHITECTURE.md`. The following decisions are settled and not up for re-litigation:
+
+- [x] **AG.1** Contacts and Members are separate collections (ADR-2)
+- [x] **AG.2** Business logic lives in `src/lib/` service layer, not in Payload hooks (ADR-3)
+- [x] **AG.3** Service layer directory structure defined (ADR-4)
+- [x] **AG.4** Dual auth model — Payload auth for admin, NextAuth for member portal (ADR-5)
+- [x] **AG.5** Order state machine with explicit transitions (ADR-6)
+- [x] **AG.6** Audit logging for all critical transitions (ADR-7)
+- [x] **AG.7** Bounded contexts declared with ownership (ADR-8)
+
+---
+
 ## Phase 7: Admin UX & Custom Views
 
 The default Payload admin is functional but looks like a developer tool. Chamber staff need it to feel approachable — clear labels, logical grouping, helpful descriptions, and a dashboard that surfaces what matters. Business workflows (CRM, event management) get purpose-built custom views, not generic collection editors.
 
 ### Dashboard
-- [ ] **7.1** Custom dashboard component — replace the default "welcome" block with a Chamber OS dashboard showing: recent events (next 5 upcoming), recent orders (last 10), quick-action buttons ("Create Event", "New News Post", "Add Member")
-- [ ] **7.2** At-a-glance stats panel — total active members, upcoming events count, tickets sold this month (queries run server-side)
+- [x] **7.1** Custom dashboard component — replace the default "welcome" block with a Chamber OS dashboard showing: recent events (next 5 upcoming), recent posts (last 5), quick-action buttons ("Create Event", "New News Post", "New Page"), at-a-glance stat cards
+- [x] **7.2** At-a-glance stats panel — upcoming events count, published posts count, published pages count (queries run server-side). Members/orders stats are placeholder until Phase 9.
 
 ### Custom Admin Views
 - [ ] **7.3** Register custom views in `payload.config.ts` under `admin.components.views` — these render inside the admin shell (same sidebar, same auth) but with purpose-built UIs
 - [ ] **7.4** **Events Manager view** (`/admin/events-manager`) — calendar/list hybrid showing upcoming events, ticket sales status, quick actions (duplicate event, create from template). Not a replacement for the Events collection CRUD, but a workflow-oriented overview.
-- [ ] **7.5** **CRM Dashboard view** (`/admin/crm`) — member overview with search/filter, membership status breakdown, renewal alerts, recent activity. Queries the Members collection via Local API.
-- [ ] **7.6** **Orders view** (`/admin/orders-dashboard`) — filterable order list with status, revenue summary, export capability. Purpose-built for staff who need to check ticket sales, not navigate a generic collection list.
+- [ ] **7.5** **CRM Dashboard view** (`/admin/crm`) — member overview with search/filter, membership status breakdown, renewal alerts, recent activity. Queries the Members collection via Local API. _(blocked until Phase 9)_
+- [ ] **7.6** **Orders view** (`/admin/orders-dashboard`) — filterable order list with status, revenue summary, export capability. Purpose-built for staff who need to check ticket sales, not navigate a generic collection list. _(blocked until Phase 9)_
 - [ ] **7.7** Custom sidebar nav group component (`afterNavLinks`) — adds "Chamber Management" section to the sidebar with links to the custom views above
 
 ### Collection UX
-- [ ] **7.8** Descriptive field labels and `description` help text on every non-obvious field across all collections — no developer jargon, plain English (e.g., "Service Fee" description: "A small fee added to each ticket to cover platform costs. Leave as 'None' if you don't want to charge extra.")
-- [ ] **7.9** Sensible `admin.defaultColumns` on all list views — Events: title, date, status, ticketing; Members: business name, contact name, tier, status; Orders: event title, purchaser, status, date
-- [ ] **7.10** Admin groups — organize collections in the sidebar: "Content" (Pages, News, Media), "Events" (Events, Event Templates), "Members" (Members, Membership Tiers), "Settings" (Site Settings, Header, Footer, Team, Users)
-- [ ] **7.11** `useAsTitle` on all collections — Events use title, Members use business name, Team uses name, etc.
-- [ ] **7.12** Collapsed-by-default for complex nested fields (ticket-types array, service fee group) so the event form doesn't look overwhelming on first load
+- [x] **7.8** Descriptive field labels and `description` help text on every non-obvious field across all collections — no developer jargon, plain English (e.g., "Service Fee" description: "A small fee added to each ticket to cover platform costs. Leave as 'None' if you don't want to charge extra.")
+- [x] **7.9** Sensible `admin.defaultColumns` on all list views — Events: title, date, status, ticketing; Posts/Pages: title, slug, updatedAt. Members/Orders columns will be set when those collections ship (Phase 9).
+- [x] **7.10** Admin groups — organize collections in the sidebar: "Content" (Pages, Posts, Media, Categories), "Events" (Events, Event Templates), "Settings" (Site Settings, Header, Footer, Team, Users). "Members & Contacts" and "Purchases" groups will be added in Phase 9.
+- [x] **7.11** `useAsTitle` on all collections — Events use title, Team uses name, EventTemplates use seriesName, etc. (all were already set; verified)
+- [x] **7.12** Collapsed-by-default for complex nested fields — ticket-types array and service fee group both collapse on load. (`initCollapsed` on arrays; description-only on groups since groups don't support `initCollapsed`)
 
 ### Block Picker UX
-- [ ] **7.13** Descriptive block labels with `admin.description` — staff should know what each block does without trying it (e.g., "Card Grid: A row of cards, each with an optional image, heading, and text. Great for team bios or service highlights.")
-- [ ] **7.14** Logical block ordering in the picker — most-used blocks first (hero, text-columns, card-grid, image-text), specialized blocks later (map-embed, contact-form)
+- [x] **7.13** Descriptive block labels on all blocks — proper singular/plural labels added to Archive, Banner, CallToAction, Content, MediaBlock. CardGrid, CtaBanner, EventsList, IconGrid, ImageText, MixedContentRow, NewsFeed, SponsorsGrid, StatsBar, Testimonials, TextColumns already had labels.
+- [x] **7.14** Logical block ordering in the picker — most-used first (Content, Image+Text, Card Grid, Text Columns, CTA, CTA Banner), then specialized content (Events List, News Feed, Testimonials, Sponsors Grid, Stats Bar, Icon Grid, Mixed Content Row), then utility (Media, Archive, Form).
 
 ### Live Preview
 - [ ] **7.15** Verify live preview works for all new blocks and collections — the template already has breakpoint config, but new blocks need to render correctly in preview mode
 
 ---
 
-## Phase 8: Feature Flags
+## Phase 9: Contacts, Members & Orders
 
-- [ ] **8.1** Create `lib/features.ts` — reads `CHAMBER_FEATURES` env var (JSON), exports typed `isFeatureEnabled(feature)` function with Zod validation
-- [ ] **8.2** Define feature keys: `events`, `ticketing`, `memberCrm`, `newsAndBlog`, `sponsorsManagement`
-- [ ] **8.3** Apply `admin.hidden` functions on collections gated by feature flags (Events, Event Templates, Orders, Members, etc.)
-- [ ] **8.4** Guard frontend routes — return 404 when feature is disabled
-- [ ] **8.5** Guard blocks — hide feature-gated blocks from the block picker (don't render them either)
-- [ ] **8.6** Write tests for feature flag logic
+> **Read `ARCHITECTURE.md` (ADR-2 through ADR-7) before implementing this phase.** Contacts and Members are separate entities. Business logic lives in the service layer. Orders follow an explicit state machine.
 
----
+Payload collections provide storage, admin UI, and typed API. Business logic (lifecycle transitions, billing, onboarding) lives in `src/lib/` services that are independently testable. Hooks are thin wrappers that call services.
 
-## Phase 9: Remaining Collections & Member Data
-
-Members, Membership Tiers, and Orders are **Payload collections** (for data storage, access control, and basic CRUD). The purpose-built admin views for CRM and order management (Phase 7) query these same collections — the distinction is data layer (collection) vs. presentation layer (custom view).
+### Contacts
+- [x] **9.0a** Create Contacts collection — name, email, phone, address, type (`person` | `organization`), organization relationship (self-ref for linking people to their org), tags (array), notes (rich text), social links, website
+- [x] **9.0b** Add access control — admin/staff full CRUD, public read limited fields for directory (future)
+- [x] **9.0c** Add `admin.group: 'Members & Contacts'` for sidebar organization
 
 ### Members
-- [ ] **9.1** Create Members collection — contact info (name, email, phone, address), business name, website, social links, membership tier (relationship), status (active/lapsed/pending), renewal date, notes (rich text)
-- [ ] **9.2** Add access control — admin/staff full access, members can read own record (for portal), public read limited fields for directory (future)
-- [ ] **9.3** Feature-flag gate the collection
-- [ ] **9.4** Add `admin.group: 'Members'` for sidebar organization
-- [ ] **9.10** Staff-assisted onboarding workflow (MVP path) — create a staff-centric onboarding flow in admin/CRM for adding a new member with sane defaults, required validation, and internal notes/tasks
-- [ ] **9.11** Reusable onboarding service layer — centralize onboarding logic in Next.js services so both staff onboarding and future self-serve onboarding use the same validation and side effects
+- [x] **9.1** Create Members collection — contact relationship (required → Contacts, the entity that IS the member — org or person), primary contact relationship (optional → Contacts, the go-to human when member is an org), membership tier (relationship → Membership Tiers), status (`pending` | `active` | `lapsed` | `cancelled` | `reinstated`), renewal date, joined date, stripe customer ID (optional), xero contact ID (optional, for accounting sync), internal notes (rich text). Admin labels: singular "Member", plural "Members".
+- [x] **9.2** Add access control — admin/staff full access, members can read own record via portal (with `overrideAccess: false`), no public access
+- [x] **9.3** Add `admin.group: 'Members & Contacts'` for sidebar organization
+- [ ] **9.10** Staff-assisted onboarding workflow (MVP path) — admin/CRM flow with two paths: "New Organization Member" (create/select org Contact, select/create primary contact person) and "New Individual Member" shortcut (creates person Contact + Member in one step)
+- [x] **9.11** Create `src/lib/members/membership-service.ts` — lifecycle transitions (activate, lapse, reinstate, cancel) with audit logging via `AuditService`. No lifecycle logic in hooks.
+- [x] **9.12** Create `src/lib/members/onboarding-service.ts` — centralized onboarding logic used by both staff-assisted and future self-serve flows. Creates Contact + Member records atomically.
+- [x] **9.13** Create `src/lib/audit/audit-service.ts` — append-only logging for critical transitions (member status changes, order status changes, payment events). See ADR-7.
 
 ### Membership Tiers
-- [ ] **9.4** Create Membership Tiers collection — name, annual price (number), features list (array of text), description (rich text), display order, Stripe Price ID (text, optional)
+- [x] **9.4** Create Membership Tiers collection — name, annual price (number), features list (array of text), description (rich text), display order, Stripe Price ID (text, optional)
 - [ ] **9.5** Build `membership-tiers` block — Payload schema (section heading, optional intro text, background variant) + render component (tier cards with pricing, feature list, CTA)
 
 ### Orders
-- [ ] **9.6** Create Orders collection — event (relationship), ticket type identifier, purchaser name + email, **optional** member relationship (nullable), Stripe Payment Intent ID, status (pending/confirmed/refunded), QR token (text, auto-generated), quantity
-- [ ] **9.7** Add access control — admin read/update, no public create (API endpoint handles creation)
-- [ ] **9.8** Feature-flag gate (gated on `ticketing`)
+- [x] **9.6** Create Orders collection — event (relationship), ticket type identifier, purchaser name + email, **optional** contact relationship (nullable → Contacts), Stripe Payment Intent ID, status (`pending` | `confirmed` | `refunded`), QR token (text, auto-generated), quantity, service fee amount (tracked separately for reporting)
+- [x] **9.7** Add access control — admin read/update, no public create (API endpoint handles creation via `OrderService`). **Status field is not directly editable in admin** — transitions go through `OrderService` (ADR-6).
+- [x] **9.14** Create `src/lib/orders/order-service.ts` — explicit state machine for order transitions (pending → confirmed → refunded) with idempotent webhook handling and audit logging. See ADR-6.
+- [x] **9.15** Create `src/lib/orders/fee-calculator.ts` — pure function for service fee calculation (percentage, flat, none). TDD this first.
 
 ### Generate & validate
-- [ ] **9.9** Generate types and validate
+- [x] **9.9** Generate types and validate
 
 ---
 
@@ -238,6 +255,8 @@ Members, Membership Tiers, and Orders are **Payload collections** (for data stor
 
 ## Phase 11: Stripe Integration
 
+> **All payment logic lives in `src/lib/stripe/` and `src/lib/orders/`.** No Stripe API calls in hooks or API route handlers directly. API routes validate input and delegate to service functions. See ADR-3.
+
 ### Payment infrastructure
 - [ ] **11.1** Create `lib/stripe/client.ts` — initialized Stripe SDK with env validation
 - [ ] **11.2** Create `lib/stripe/create-payment-intent.ts` — takes event ID, ticket type, quantity; calculates total including service fee; creates Payment Intent; returns client secret
@@ -245,7 +264,7 @@ Members, Membership Tiers, and Orders are **Payload collections** (for data stor
 
 ### API routes
 - [ ] **11.4** Create checkout API route — `app/api/checkout/route.ts` — validates request, calls createPaymentIntent, returns client secret; **must support guest checkout (no member auth required)**
-- [ ] **11.5** Create webhook handler — `app/api/webhooks/stripe/route.ts` — verifies signature, handles `payment_intent.succeeded`, creates Order, generates QR token
+- [ ] **11.5** Create webhook handler — `app/api/webhooks/stripe/route.ts` — verifies signature, delegates to `OrderService.confirmFromWebhook()` which handles idempotent order confirmation, QR token generation, audit logging, and confirmation email. Webhook handler is thin.
 
 ### Frontend checkout
 - [ ] **11.6** Build ticket selection UI on event detail page — select ticket type, quantity, see price breakdown including service fee
@@ -260,14 +279,14 @@ Members, Membership Tiers, and Orders are **Payload collections** (for data stor
 
 ## Phase 12: Public Frontend Polish
 
-- [ ] **12.1** Homepage — assemble from blocks using seed data (hero, about+stats, icon-grid, events, news, testimonials, sponsors)
-- [ ] **12.2** Ensure all pages have `generateMetadata()` with proper title, description, OG tags
-- [ ] **12.3** Add JSON-LD structured data for events (Event schema)
+- [x] **12.1** Homepage — assemble from blocks using seed data (hero, about+stats, icon-grid, events, news, testimonials, sponsors)
+- [x] **12.2** Ensure all pages have `generateMetadata()` with proper title, description, OG tags
+- [x] **12.3** Add JSON-LD structured data for events (Event schema)
 - [ ] **12.4** Verify responsive behavior at mobile, tablet, desktop breakpoints
-- [ ] **12.5** Accessibility audit — proper heading hierarchy, alt text, keyboard navigation, focus management
+- [x] **12.5** Accessibility audit — proper heading hierarchy, alt text, keyboard navigation, focus management
 - [ ] **12.6** Performance audit — image optimization via `next/image`, font loading strategy, bundle size check
-- [ ] **12.7** 404 and error pages styled consistently with theme
-- [ ] **12.8** Sitemap generation (next-sitemap is already configured — verify it works)
+- [x] **12.7** 404 and error pages styled consistently with theme
+- [x] **12.8** Sitemap generation (next-sitemap is already configured — verify it works)
 
 ---
 
@@ -285,7 +304,6 @@ Two tracks: easy third-party integration (Google Analytics et al.) and lightweig
 - [ ] **13.5** Build background ingestion — a cron job or Payload job that parses server/access logs (nginx, Caddy, or Next.js middleware-logged entries) and upserts daily page view counts. Runs off the request path, no real-time tracking overhead.
 - [ ] **13.6** Alternative lightweight approach: Next.js middleware that increments a counter via a non-blocking fire-and-forget API call (or queues to a simple buffer that flushes periodically). Must not add latency to page loads — if it can't be truly non-blocking, use the log-parsing approach instead.
 - [ ] **13.7** Admin stats dashboard panel — extend the custom dashboard (Phase 7.1) with a "Site Stats" tab or section: page views over last 7/30/90 days, top pages, basic trend line. Server-rendered, queries the `page-views` collection.
-- [ ] **13.8** Feature-flag gate the built-in stats (`builtInAnalytics`) — some deployments may only want GA and not the overhead of local tracking
 
 ---
 
@@ -298,15 +316,30 @@ Two tracks: easy third-party integration (Google Analytics et al.) and lightweig
 
 ---
 
-## Phase 15: Member Portal (Post-MVP)
+## Phase 15: Feature Flags (Deferred — Multi-Tenant Prep)
 
-The member portal is a **Next.js sub-app** under `/members/*` — standard React pages with their own auth, not Payload admin views. It shares the same database (reads/writes Payload's Members collection) but has a completely separate UX designed for members, not staff.
+> Not needed for V0 beta (single chamber, all features enabled). Implement when preparing for multi-tenant deployment or white-label distribution.
+
+- [ ] **15.1** Create `lib/features.ts` — reads `CHAMBER_FEATURES` env var (JSON), exports typed `isFeatureEnabled(feature)` function with Zod validation
+- [ ] **15.2** Define feature keys: `events`, `ticketing`, `memberCrm`, `newsAndBlog`, `sponsorsManagement`, `memberPortal`, `builtInAnalytics`
+- [ ] **15.3** Apply `admin.hidden` functions on collections gated by feature flags
+- [ ] **15.4** Guard frontend routes — return 404 when feature is disabled
+- [ ] **15.5** Guard blocks — hide feature-gated blocks from the block picker
+- [ ] **15.6** Write tests for feature flag logic
+
+---
+
+## Phase 16: Member Portal (Post-MVP)
+
+> **Read `ARCHITECTURE.md` ADR-5 before implementing.** The member portal authenticates against the **Contacts** collection via NextAuth, not Payload auth. Membership status determines authorization, not authentication. A Contact with no active membership can still log in.
+
+The member portal is a **Next.js sub-app** under `/members/*` — standard React pages with their own auth, not Payload admin views. It shares the same database (reads Contacts + Members collections) but has a completely separate UX designed for members, not staff.
 
 ### Auth
-- [ ] **15.1** Install and configure NextAuth/AuthJS with credentials provider (email + password)
-- [ ] **15.2** Member self-onboarding flow (post staff-first rollout) — friendly registration/join path with email verification, profile creation, and link to Members collection record
+- [ ] **15.1** Install and configure NextAuth/AuthJS with credentials provider (email + password) — authenticates against Contacts collection
+- [ ] **15.2** Member self-onboarding flow (post staff-first rollout) — friendly registration/join path with email verification, Contact creation, and onboarding via `OnboardingService`
 - [ ] **15.3** Password reset flow
-- [ ] **15.4** Session management — JWT or database sessions, configurable timeout
+- [ ] **15.4** Session management — JWT or database sessions, configurable timeout. Session carries Contact ID; membership status is looked up per-request from Members collection.
 
 ### Portal Pages
 - [ ] **15.5** Member dashboard (`/members/dashboard`) — overview of membership status, upcoming events, recent activity
@@ -319,12 +352,9 @@ The member portal is a **Next.js sub-app** under `/members/*` — standard React
 - [ ] **15.10** Member directory page (`/members/directory`) — searchable, filterable list of active members with public profile info. No auth required for browsing; member controls which fields are public.
 - [ ] **15.11** Individual member profile page (`/members/directory/[slug]`) — public-facing business profile
 
-### Feature Flag
-- [ ] **15.12** Gate the entire portal behind `memberPortal` feature flag — routes return 404 when disabled
-
 ---
 
-## Phase 16: Visual Page Editor Investigation
+## Phase 17: Visual Page Editor Investigation
 
 - [ ] **16.1** Evaluate [Puck](https://github.com/measuredco/puck) — MIT-licensed embeddable React visual page editor. Install in a throwaway branch, define 2–3 block types, assess UX quality and integration complexity with our Payload backend.
 - [ ] **16.2** Prototype Puck integration — build a proof-of-concept custom admin view that embeds Puck for page editing, mapping Puck's JSON output to our existing Payload block schema. Assess whether the improved editing UX justifies the added React dependency.
@@ -332,7 +362,7 @@ The member portal is a **Next.js sub-app** under `/members/*` — standard React
 
 ---
 
-## Phase 17: Forums & Governance (Future)
+## Phase 18: Forums & Governance (Future)
 
 These build on the member portal and are part of the long-term "democracy in a box" vision. Not in MVP scope but documented to ensure architecture decisions don't block them.
 
@@ -351,7 +381,7 @@ These build on the member portal and are part of the long-term "democracy in a b
 
 ---
 
-## Phase 18: External Accounting Integrations (Later Nice-to-Have)
+## Phase 19: External Accounting Integrations (Later Nice-to-Have)
 
 - [ ] **18.1** Design integration boundary — define outbound sync events for member create/update and optional order/invoice updates
 - [ ] **18.2** Implement Xero connector (optional, feature-flagged) — OAuth setup, contact/customer mapping, retry-safe background sync jobs

@@ -8,6 +8,11 @@ import {
 
 export const Banner: Block = {
   slug: 'banner',
+  interfaceName: 'BannerBlock',
+  labels: {
+    singular: 'Banner',
+    plural: 'Banners',
+  },
   fields: [
     {
       name: 'style',
@@ -33,5 +38,4 @@ export const Banner: Block = {
       required: true,
     },
   ],
-  interfaceName: 'BannerBlock',
 }

@@ -21,6 +21,7 @@ export const Team: CollectionConfig<'team'> = {
     update: authenticated,
   },
   admin: {
+    group: 'Settings',
     defaultColumns: ['name', 'title', 'type', 'status', 'displayOrder'],
     useAsTitle: 'name',
   },
@@ -65,6 +66,9 @@ export const Team: CollectionConfig<'team'> = {
       type: 'number',
       defaultValue: 0,
       required: true,
+      admin: {
+        description: 'Lower numbers appear first. Use this to control the order staff and board members are shown.',
+      },
     },
     {
       name: 'email',
@@ -73,6 +77,9 @@ export const Team: CollectionConfig<'team'> = {
     {
       name: 'linkedin',
       type: 'text',
+      admin: {
+        description: 'Full LinkedIn profile URL (e.g., https://linkedin.com/in/janedoe).',
+      },
     },
     {
       name: 'status',

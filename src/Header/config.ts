@@ -14,6 +14,9 @@ import { revalidateHeader } from './hooks/revalidateHeader'
  */
 export const Header: GlobalConfig = {
   slug: 'header',
+  admin: {
+    group: 'Settings',
+  },
   access: {
     read: () => true,
   },

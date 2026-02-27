@@ -1,8 +1,15 @@
 import type { Access, CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
+import { currencyField } from '../../fields/currencyField'
 import { revalidateEvent, revalidateEventDelete } from './hooks/revalidateEvent'
 import { slugField } from 'payload'
+import {
+  HeadingFeature,
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 
 const authenticatedOrPublishedEvent: Access = ({ req: { user } }) => {
   if (user) return true
@@ -69,7 +76,7 @@ const applyEventTemplateDefaults: CollectionBeforeValidateHook = async ({
       capacity: ticketType.capacity,
       description: ticketType.description,
       name: ticketType.name,
-      priceCents: ticketType.priceCents,
+      price: ticketType.price,
       saleEnd: ticketType.saleEnd,
       saleStart: ticketType.saleStart,
     }))
@@ -101,6 +108,7 @@ export const Events: CollectionConfig<'events'> = {
     update: authenticated,
   },
   admin: {
+    group: 'Events',
     defaultColumns: ['title', 'startDate', 'status', 'ticketingType', 'isChambersEvent'],
     useAsTitle: 'title',
   },
@@ -125,6 +133,14 @@ export const Events: CollectionConfig<'events'> = {
       name: 'description',
       type: 'richText',
       required: true,
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => [
+          ...rootFeatures,
+          HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
+      }),
     },
     {
       name: 'eventTemplate',
@@ -169,12 +185,18 @@ export const Events: CollectionConfig<'events'> = {
       name: 'isFeatured',
       type: 'checkbox',
       defaultValue: false,
+      admin: {
+        description: 'Featured events appear prominently on the homepage and events page.',
+      },
     },
     {
       name: 'isChambersEvent',
       type: 'checkbox',
       defaultValue: true,
       label: 'Is Chamber Event',
+      admin: {
+        description: 'Uncheck for partner or community events hosted by other organizations.',
+      },
     },
     {
       name: 'status',
@@ -200,6 +222,9 @@ export const Events: CollectionConfig<'events'> = {
       name: 'ticketingType',
       type: 'select',
       defaultValue: 'none',
+      admin: {
+        description: 'Choose how tickets are handled: no ticketing, link to an external site, or manage sales directly through the platform.',
+      },
       options: [
         {
           label: 'No Ticketing',
@@ -241,12 +266,11 @@ export const Events: CollectionConfig<'events'> = {
           name: 'description',
           type: 'textarea',
         },
-        {
-          name: 'priceCents',
-          type: 'number',
-          min: 0,
+        currencyField({
+          name: 'price',
           required: true,
-        },
+          description: 'Ticket price. Enter in dollars (stored in minor units internally).',
+        }),
         {
           name: 'capacity',
           type: 'number',
@@ -278,6 +302,7 @@ export const Events: CollectionConfig<'events'> = {
       type: 'group',
       admin: {
         condition: (_, siblingData) => siblingData.ticketingType === 'chamber-managed',
+        description: 'A small fee added to each ticket to cover platform costs. Leave as "None" if you don\'t want to charge extra.',
       },
       fields: [
         {

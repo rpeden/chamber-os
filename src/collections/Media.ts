@@ -17,6 +17,9 @@ const dirname = path.dirname(filename)
 export const Media: CollectionConfig = {
   slug: 'media',
   folders: true,
+  admin: {
+    group: 'Content',
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -27,7 +30,9 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      //required: true,
+      admin: {
+        description: 'Describe the image for screen readers and SEO (e.g., "Board members at the 2025 gala").',
+      },
     },
     {
       name: 'caption',

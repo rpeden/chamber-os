@@ -40,6 +40,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
+          <a
+            className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+            href="#main-content"
+          >
+            Skip to main content
+          </a>
           <AdminBar
             adminBarProps={{
               preview: isEnabled,
@@ -47,7 +53,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
 
           <Header />
-          {children}
+          <main id="main-content">
+            {children}
+          </main>
           <Footer />
         </Providers>
       </body>
@@ -60,6 +68,5 @@ export const metadata: Metadata = {
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
   },
 }
