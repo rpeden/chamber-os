@@ -11,9 +11,8 @@ const baseClass = 'chamber-dashboard'
  * Chamber OS admin dashboard panel.
  *
  * Server Component rendered above the default Payload collection list.
- * Shows at-a-glance stats, upcoming events, recent news, and quick-action links.
- *
- * Members/Orders stats will be wired in when those collections ship (Phase 9).
+ * Shows at-a-glance stats (content + membership), upcoming events,
+ * recent news, membership health breakdown, and quick-action links.
  */
 const BeforeDashboard: React.FC = async () => {
   const payload = await getPayload({ config })
@@ -29,7 +28,27 @@ const BeforeDashboard: React.FC = async () => {
   const publishedPostsFilter: Where = { _status: { equals: 'published' } }
   const publishedPagesFilter: Where = { _status: { equals: 'published' } }
 
-  const [upcomingEvents, recentPosts, eventCount, postCount, pageCount] = await Promise.all([
+  // Member status filters
+  const activeMembersFilter: Where = { status: { equals: 'active' } }
+  const lapsedMembersFilter: Where = { status: { equals: 'lapsed' } }
+  const overdueFilter: Where = {
+    and: [
+      { status: { equals: 'active' } },
+      { renewalDate: { less_than: now } },
+    ],
+  }
+
+  const [
+    upcomingEvents,
+    recentPosts,
+    eventCount,
+    postCount,
+    pageCount,
+    activeCount,
+    lapsedCount,
+    overdueCount,
+    tierBreakdown,
+  ] = await Promise.all([
     payload.find({
       collection: 'events',
       limit: 5,
@@ -67,7 +86,43 @@ const BeforeDashboard: React.FC = async () => {
       collection: 'pages',
       where: publishedPagesFilter,
     }),
+    payload.count({
+      collection: 'members',
+      where: activeMembersFilter,
+    }),
+    payload.count({
+      collection: 'members',
+      where: lapsedMembersFilter,
+    }),
+    payload.count({
+      collection: 'members',
+      where: overdueFilter,
+    }),
+    // Fetch all tiers + count active members per tier
+    payload.find({
+      collection: 'membership-tiers',
+      sort: 'displayOrder',
+      limit: 20,
+      select: { name: true },
+      depth: 0,
+    }),
   ])
+
+  // Count active members per tier (parallel)
+  const tierCounts = await Promise.all(
+    tierBreakdown.docs.map(async (tier) => {
+      const count = await payload.count({
+        collection: 'members',
+        where: {
+          and: [
+            { status: { equals: 'active' } },
+            { membershipTier: { equals: tier.id } },
+          ],
+        },
+      })
+      return { name: tier.name, count: count.totalDocs }
+    }),
+  )
 
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat('en-CA', {
@@ -85,6 +140,22 @@ const BeforeDashboard: React.FC = async () => {
 
       {/* At-a-glance stats */}
       <div className={`${baseClass}__stats`}>
+        <a href="/admin/collections/members" className={`${baseClass}__stat`}>
+          <span className={`${baseClass}__stat-value`}>{activeCount.totalDocs}</span>
+          <span className={`${baseClass}__stat-label`}>Active Members</span>
+        </a>
+        {overdueCount.totalDocs > 0 && (
+          <a href="/admin/collections/members?where[and][0][status][equals]=active&where[and][1][renewalDate][less_than]=${now}" className={`${baseClass}__stat ${baseClass}__stat--warning`}>
+            <span className={`${baseClass}__stat-value`}>{overdueCount.totalDocs}</span>
+            <span className={`${baseClass}__stat-label`}>Overdue</span>
+          </a>
+        )}
+        {lapsedCount.totalDocs > 0 && (
+          <a href="/admin/collections/members?where[status][equals]=lapsed" className={`${baseClass}__stat ${baseClass}__stat--muted`}>
+            <span className={`${baseClass}__stat-value`}>{lapsedCount.totalDocs}</span>
+            <span className={`${baseClass}__stat-label`}>Lapsed</span>
+          </a>
+        )}
         <a href="/admin/collections/events" className={`${baseClass}__stat`}>
           <span className={`${baseClass}__stat-value`}>{eventCount.totalDocs}</span>
           <span className={`${baseClass}__stat-label`}>Upcoming Events</span>
@@ -101,6 +172,9 @@ const BeforeDashboard: React.FC = async () => {
 
       {/* Quick actions */}
       <div className={`${baseClass}__actions`}>
+        <a href="/admin/collections/members/create" className={`${baseClass}__action`}>
+          + New Member
+        </a>
         <a href="/admin/collections/events/create" className={`${baseClass}__action`}>
           + New Event
         </a>
@@ -114,6 +188,28 @@ const BeforeDashboard: React.FC = async () => {
 
       {/* Content panels */}
       <div className={`${baseClass}__panels`}>
+        {/* Membership by Tier panel */}
+        {tierCounts.length > 0 && (
+          <div className={`${baseClass}__panel`}>
+            <div className={`${baseClass}__panel-header`}>
+              <h3>Members by Tier</h3>
+              <a href="/admin/collections/members" className={`${baseClass}__view-all`}>
+                View All →
+              </a>
+            </div>
+            <ul className={`${baseClass}__list`}>
+              {tierCounts.map((tier) => (
+                <li key={tier.name} className={`${baseClass}__list-item`}>
+                  <a href={`/admin/collections/members`}>
+                    <span className={`${baseClass}__list-title`}>{tier.name}</span>
+                    <span className={`${baseClass}__tier-count`}>{tier.count}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Upcoming Events panel */}
         <div className={`${baseClass}__panel`}>
           <div className={`${baseClass}__panel-header`}>

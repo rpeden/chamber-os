@@ -18,6 +18,7 @@ import { EventsList } from '../../blocks/EventsList/config'
 import { NewsFeed } from '../../blocks/NewsFeed/config'
 import { Testimonials } from '../../blocks/Testimonials/config'
 import { SponsorsGrid } from '../../blocks/SponsorsGrid/config'
+import { MembershipTiersBlock } from '../../blocks/MembershipTiers/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -100,6 +101,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 StatsBar,
                 IconGrid,
                 MixedContentRow,
+                MembershipTiersBlock,
                 // Utility
                 MediaBlock,
                 Archive,

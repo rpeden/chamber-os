@@ -1,6 +1,36 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionAfterReadHook, CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
+
+/**
+ * Populates the virtual `title` field with the contact's name
+ * so the admin list view and page header show something useful
+ * instead of a raw database ID.
+ */
+const populateMemberTitle: CollectionAfterReadHook = async ({ doc, req }) => {
+  if (!doc.contact) return doc
+
+  const contactId = typeof doc.contact === 'object' ? doc.contact.id : doc.contact
+
+  if (!contactId) return doc
+
+  // If the contact was already populated (depth > 0), grab the name directly
+  if (typeof doc.contact === 'object' && doc.contact.name) {
+    doc.title = doc.contact.name
+    return doc
+  }
+
+  // Otherwise fetch it
+  const contact = await req.payload.findByID({
+    collection: 'contacts',
+    id: contactId,
+    depth: 0,
+    select: { name: true },
+  })
+
+  doc.title = contact?.name ?? `Member ${contactId}`
+  return doc
+}
 
 /**
  * Members collection — represents the membership relationship.
@@ -24,12 +54,32 @@ export const Members: CollectionConfig = {
     read: authenticated, // Future: members can read own record via portal with overrideAccess: false
     update: authenticated,
   },
+  defaultSort: '-renewalDate',
   admin: {
     group: 'Members & Contacts',
-    defaultColumns: ['contact', 'membershipTier', 'status', 'renewalDate', 'joinedDate'],
-    useAsTitle: 'contact',
+    defaultColumns: ['contact', 'status', 'membershipTier', 'renewalDate', 'joinedDate'],
+    listSearchableFields: ['contact'],
+    useAsTitle: 'title',
+    description:
+      'Use column header filters to view members by status (e.g., "lapsed", "cancelled") or by tier. Click column headers to sort.',
   },
   fields: [
+    // Virtual title field — populated by afterRead hook from the linked contact's name
+    {
+      name: 'title',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+      hooks: {
+        afterRead: [
+          ({ siblingData }) => {
+            // Return synthetic value — the real population happens in the collection hook
+            return siblingData?.title
+          },
+        ],
+      },
+    },
     // Core relationships
     {
       name: 'contact',
@@ -131,5 +181,8 @@ export const Members: CollectionConfig = {
       },
     },
   ],
+  hooks: {
+    afterRead: [populateMemberTitle],
+  },
   timestamps: true,
 }

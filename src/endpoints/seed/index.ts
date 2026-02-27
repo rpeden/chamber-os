@@ -34,6 +34,7 @@ import { boardPresident, boardVicePresident, boardTreasurer } from './chamber-te
 import { chamberHomepage } from './chamber-home'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
+import { seedMembers } from './chamber-members'
 
 /** Every collection we need to nuke before seeding. */
 const collections: CollectionSlug[] = [
@@ -47,6 +48,11 @@ const collections: CollectionSlug[] = [
   'forms',
   'form-submissions',
   'search',
+  'contacts',
+  'members',
+  'membership-tiers',
+  'orders',
+  'audit-log',
 ]
 
 /** Every global we need to reset. */
@@ -269,6 +275,10 @@ export const seed = async ({
       data: boardTreasurer({ headshot: images['board-treasurer.png'] }),
     }),
   ])
+
+  // ─── Step 7b: Create membership tiers, contacts, members ──────
+
+  await seedMembers(payload)
 
   // ─── Step 8: Create contact form + pages ───────────────────────
 

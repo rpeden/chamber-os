@@ -22,6 +22,7 @@ export const Contacts: CollectionConfig = {
   admin: {
     group: 'Members & Contacts',
     defaultColumns: ['name', 'email', 'type', 'organization', 'createdAt'],
+    listSearchableFields: ['name', 'email'],
     useAsTitle: 'name',
   },
   fields: [

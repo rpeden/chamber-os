@@ -85,3 +85,5 @@ export const CurrencyField: NumberFieldClientComponent = (props) => {
     </div>
   )
 }
+
+export default CurrencyField

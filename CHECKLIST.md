@@ -232,7 +232,7 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 
 ### Membership Tiers
 - [x] **9.4** Create Membership Tiers collection — name, annual price (number), features list (array of text), description (rich text), display order, Stripe Price ID (text, optional)
-- [ ] **9.5** Build `membership-tiers` block — Payload schema (section heading, optional intro text, background variant) + render component (tier cards with pricing, feature list, CTA)
+- [x] **9.5** Build `membership-tiers` block — Payload schema (section heading, optional intro text, background variant) + render component (tier cards with pricing, feature list, CTA). Highlighted tier support, currency-aware pricing display, responsive grid.
 
 ### Orders
 - [x] **9.6** Create Orders collection — event (relationship), ticket type identifier, purchaser name + email, **optional** contact relationship (nullable → Contacts), Stripe Payment Intent ID, status (`pending` | `confirmed` | `refunded`), QR token (text, auto-generated), quantity, service fee amount (tracked separately for reporting)

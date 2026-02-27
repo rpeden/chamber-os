@@ -71,6 +71,10 @@ const applyEventTemplateDefaults: CollectionBeforeValidateHook = async ({
     data.externalTicketUrl = template.defaultExternalTicketUrl
   }
 
+  if (data.registrationCapacity == null && template.defaultRegistrationCapacity) {
+    data.registrationCapacity = template.defaultRegistrationCapacity
+  }
+
   if ((!data.ticketTypes || data.ticketTypes.length === 0) && template.defaultTicketTypes) {
     data.ticketTypes = template.defaultTicketTypes.map((ticketType) => ({
       capacity: ticketType.capacity,
@@ -223,7 +227,7 @@ export const Events: CollectionConfig<'events'> = {
       type: 'select',
       defaultValue: 'none',
       admin: {
-        description: 'Choose how tickets are handled: no ticketing, link to an external site, or manage sales directly through the platform.',
+        description: 'Choose how attendance is handled for this event.',
       },
       options: [
         {
@@ -231,11 +235,15 @@ export const Events: CollectionConfig<'events'> = {
           value: 'none',
         },
         {
-          label: 'External Ticket Link',
+          label: 'Free Registration',
+          value: 'free-registration',
+        },
+        {
+          label: 'Paid, External Link',
           value: 'external-link',
         },
         {
-          label: 'Chamber Managed',
+          label: 'Paid, Chamber Managed',
           value: 'chamber-managed',
         },
       ],
@@ -247,6 +255,15 @@ export const Events: CollectionConfig<'events'> = {
       admin: {
         condition: (_, siblingData) => siblingData.ticketingType === 'external-link',
         description: 'Use when ticket sales are handled on another platform.',
+      },
+    },
+    {
+      name: 'registrationCapacity',
+      type: 'number',
+      min: 1,
+      admin: {
+        condition: (_, siblingData) => siblingData.ticketingType === 'free-registration',
+        description: 'Maximum number of registrations. Leave blank for unlimited.',
       },
     },
     {

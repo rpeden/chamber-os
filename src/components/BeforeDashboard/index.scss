@@ -46,6 +46,21 @@
     &:hover {
       border-color: var(--theme-elevation-300);
     }
+
+    &--warning {
+      border-color: #e67e22;
+      background: rgba(230, 126, 34, 0.06);
+
+      .chamber-dashboard__stat-value {
+        color: #e67e22;
+      }
+    }
+
+    &--muted {
+      .chamber-dashboard__stat-value {
+        color: var(--theme-elevation-400);
+      }
+    }
   }
 
   &__stat-value {
@@ -163,6 +178,21 @@
         background: var(--theme-elevation-50);
       }
     }
+  }
+
+  // Tier list items: horizontal layout with count on the right
+  &__tier-count {
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--theme-text);
+  }
+
+  // Override list-item link to row layout for tier rows
+  &__panel .chamber-dashboard__list-item a:has(.chamber-dashboard__tier-count) {
+    flex-direction: row;
+    align-items: center;
+    gap: base(0.5);
   }
 
   &__list-title {

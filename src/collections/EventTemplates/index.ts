@@ -59,11 +59,15 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
           value: 'none',
         },
         {
-          label: 'External Ticket Link',
+          label: 'Free Registration',
+          value: 'free-registration',
+        },
+        {
+          label: 'Paid, External Link',
           value: 'external-link',
         },
         {
-          label: 'Chamber Managed',
+          label: 'Paid, Chamber Managed',
           value: 'chamber-managed',
         },
       ],
@@ -74,6 +78,15 @@ export const EventTemplates: CollectionConfig<'event-templates'> = {
       type: 'text',
       admin: {
         condition: (_, siblingData) => siblingData.defaultTicketingType === 'external-link',
+      },
+    },
+    {
+      name: 'defaultRegistrationCapacity',
+      type: 'number',
+      min: 1,
+      admin: {
+        condition: (_, siblingData) => siblingData.defaultTicketingType === 'free-registration',
+        description: 'Default max registrations. Leave blank for unlimited.',
       },
     },
     {

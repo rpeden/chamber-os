@@ -234,6 +234,7 @@ export interface Page {
     | StatsBarBlock
     | IconGridBlock
     | MixedContentRowBlock
+    | MembershipTiersBlock
     | MediaBlock
     | ArchiveBlock
     | FormBlock
@@ -1159,6 +1160,105 @@ export interface MixedContentRowBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MembershipTiersBlock".
+ */
+export interface MembershipTiersBlock {
+  /**
+   * Optional heading displayed above this section
+   */
+  sectionHeading?: string | null;
+  /**
+   * Optional intro paragraph displayed below the section heading.
+   */
+  introText?: string | null;
+  /**
+   * Optionally highlight one tier as "recommended" or "most popular". It will be visually emphasized.
+   */
+  highlightedTier?: (number | null) | MembershipTier;
+  /**
+   * Button text on each tier card (e.g., "Join Now", "Get Started").
+   */
+  ctaLabel?: string | null;
+  /**
+   * Where the tier card buttons link to — e.g., a contact page, application form, or member portal.
+   */
+  ctaLink: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
+  /**
+   * Background color for this section
+   */
+  background?: ('default' | 'light' | 'dark' | 'brand' | 'accent') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'membershipTiers';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-tiers".
+ */
+export interface MembershipTier {
+  id: number;
+  /**
+   * Tier name shown publicly (e.g., "Gold", "Platinum").
+   */
+  name: string;
+  /**
+   * Annual membership price. Enter in dollars (stored in minor units internally).
+   */
+  annualPrice: number;
+  /**
+   * Detailed tier description for the public-facing pricing page.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * List of features/benefits included in this tier.
+   */
+  features?:
+    | {
+        feature: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Controls the order tiers appear on the pricing page. Lower numbers appear first.
+   */
+  displayOrder?: number | null;
+  /**
+   * Stripe Price ID for automated billing. Leave blank until Stripe integration is configured.
+   */
+  stripePriceId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
@@ -1441,13 +1541,17 @@ export interface Event {
   isChambersEvent?: boolean | null;
   status: 'draft' | 'published' | 'cancelled';
   /**
-   * Choose how tickets are handled: no ticketing, link to an external site, or manage sales directly through the platform.
+   * Choose how attendance is handled for this event.
    */
-  ticketingType: 'none' | 'external-link' | 'chamber-managed';
+  ticketingType: 'none' | 'free-registration' | 'external-link' | 'chamber-managed';
   /**
    * Use when ticket sales are handled on another platform.
    */
   externalTicketUrl?: string | null;
+  /**
+   * Maximum number of registrations. Leave blank for unlimited.
+   */
+  registrationCapacity?: number | null;
   ticketTypes?:
     | {
         name: string;
@@ -1504,8 +1608,12 @@ export interface EventTemplate {
   } | null;
   defaultFeaturedImage?: (number | null) | Media;
   defaultLocation?: string | null;
-  defaultTicketingType: 'none' | 'external-link' | 'chamber-managed';
+  defaultTicketingType: 'none' | 'free-registration' | 'external-link' | 'chamber-managed';
   defaultExternalTicketUrl?: string | null;
+  /**
+   * Default max registrations. Leave blank for unlimited.
+   */
+  defaultRegistrationCapacity?: number | null;
   defaultTicketTypes?:
     | {
         name: string;
@@ -1636,11 +1744,14 @@ export interface Contact {
   createdAt: string;
 }
 /**
+ * Use column header filters to view members by status (e.g., "lapsed", "cancelled") or by tier. Click column headers to sort.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "members".
  */
 export interface Member {
   id: number;
+  title?: string | null;
   /**
    * The entity that IS the member — an organization or a person Contact.
    */
@@ -1691,58 +1802,6 @@ export interface Member {
     };
     [k: string]: unknown;
   } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "membership-tiers".
- */
-export interface MembershipTier {
-  id: number;
-  /**
-   * Tier name shown publicly (e.g., "Gold", "Platinum").
-   */
-  name: string;
-  /**
-   * Annual membership price. Enter in dollars (stored in minor units internally).
-   */
-  annualPrice: number;
-  /**
-   * Detailed tier description for the public-facing pricing page.
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * List of features/benefits included in this tier.
-   */
-  features?:
-    | {
-        feature: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Controls the order tiers appear on the pricing page. Lower numbers appear first.
-   */
-  displayOrder?: number | null;
-  /**
-   * Stripe Price ID for automated billing. Leave blank until Stripe integration is configured.
-   */
-  stripePriceId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2187,6 +2246,7 @@ export interface PagesSelect<T extends boolean = true> {
         statsBar?: T | StatsBarBlockSelect<T>;
         iconGrid?: T | IconGridBlockSelect<T>;
         mixedContentRow?: T | MixedContentRowBlockSelect<T>;
+        membershipTiers?: T | MembershipTiersBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
@@ -2521,6 +2581,28 @@ export interface MixedContentRowBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MembershipTiersBlock_select".
+ */
+export interface MembershipTiersBlockSelect<T extends boolean = true> {
+  sectionHeading?: T;
+  introText?: T;
+  highlightedTier?: T;
+  ctaLabel?: T;
+  ctaLink?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  background?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
@@ -2601,6 +2683,7 @@ export interface EventsSelect<T extends boolean = true> {
   status?: T;
   ticketingType?: T;
   externalTicketUrl?: T;
+  registrationCapacity?: T;
   ticketTypes?:
     | T
     | {
@@ -2634,6 +2717,7 @@ export interface EventTemplatesSelect<T extends boolean = true> {
   defaultLocation?: T;
   defaultTicketingType?: T;
   defaultExternalTicketUrl?: T;
+  defaultRegistrationCapacity?: T;
   defaultTicketTypes?:
     | T
     | {
@@ -2828,6 +2912,7 @@ export interface ContactsSelect<T extends boolean = true> {
  * via the `definition` "members_select".
  */
 export interface MembersSelect<T extends boolean = true> {
+  title?: T;
   contact?: T;
   primaryContact?: T;
   membershipTier?: T;

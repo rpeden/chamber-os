@@ -18,6 +18,7 @@ import { EventsListBlock } from '@/blocks/EventsList/Component'
 import { NewsFeedBlock } from '@/blocks/NewsFeed/Component'
 import { TestimonialsBlock } from '@/blocks/Testimonials/Component'
 import { SponsorsGridBlock } from '@/blocks/SponsorsGrid/Component'
+import { MembershipTiersBlock } from '@/blocks/MembershipTiers/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -36,6 +37,7 @@ const blockComponents = {
   newsFeed: NewsFeedBlock,
   testimonials: TestimonialsBlock,
   sponsorsGrid: SponsorsGridBlock,
+  membershipTiers: MembershipTiersBlock,
 }
 
 export const RenderBlocks: React.FC<{
