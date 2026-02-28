@@ -105,11 +105,15 @@ export const Orders: CollectionConfig = {
     },
     currencyField({
       name: 'totalAmount',
-      description: 'Total charged amount (ticket price × quantity + service fee). Stored in minor units.',
+      description: 'Total charged amount (ticket price × quantity + service fee + tax). Stored in minor units.',
     }),
     currencyField({
       name: 'serviceFeeAmount',
       description: 'Service fee amount, tracked separately for reporting. Stored in minor units.',
+    }),
+    currencyField({
+      name: 'taxAmount',
+      description: 'Tax amount charged (e.g., HST), tracked separately for reporting. Stored in minor units.',
     }),
 
     // State machine

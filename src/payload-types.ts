@@ -1873,13 +1873,17 @@ export interface Order {
    */
   stripePaymentIntentId?: string | null;
   /**
-   * Total charged amount (ticket price × quantity + service fee). Stored in minor units.
+   * Total charged amount (ticket price × quantity + service fee + tax). Stored in minor units.
    */
   totalAmount?: number | null;
   /**
    * Service fee amount, tracked separately for reporting. Stored in minor units.
    */
   serviceFeeAmount?: number | null;
+  /**
+   * Tax amount charged (e.g., HST), tracked separately for reporting. Stored in minor units.
+   */
+  taxAmount?: number | null;
   /**
    * Order status. Follows the state machine: pending → confirmed → refunded. In production, transitions go through OrderService (ADR-6).
    */
@@ -3014,6 +3018,7 @@ export interface OrdersSelect<T extends boolean = true> {
   stripePaymentIntentId?: T;
   totalAmount?: T;
   serviceFeeAmount?: T;
+  taxAmount?: T;
   status?: T;
   qrToken?: T;
   updatedAt?: T;
@@ -3580,6 +3585,14 @@ export interface SiteSetting {
    * Custom HTML/scripts injected into <head>. Use for third-party tracking pixels, meta tags, etc. Be careful — bad scripts can break the site.
    */
   customHeadScripts?: string | null;
+  /**
+   * Name of the applicable tax (e.g., "HST", "GST", "VAT"). Leave blank if no tax applies.
+   */
+  taxName?: string | null;
+  /**
+   * Tax percentage applied to ticket price + service fee (e.g., enter 15 for 15% HST). Set to 0 to disable.
+   */
+  taxRate?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3705,6 +3718,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   gaId?: T;
   gtmId?: T;
   customHeadScripts?: T;
+  taxName?: T;
+  taxRate?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

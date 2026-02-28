@@ -270,6 +270,10 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 - [x] **11.6** Build ticket selection UI on event detail page — select ticket type, quantity, see price breakdown including service fee
 - [x] **11.7** Integrate Stripe Elements for payment form
 - [x] **11.8** Build confirmation page — order summary, QR code display (works for both guests and logged-in members)
+- [x] **11.11** Free registration flow — `createFreeRegistration` service + 8 tests; `/api/register` route; `TicketCheckout` branches free vs paid (skips Stripe for price=0); confirmation page handles `?token=<qrToken>` for instant QR display
+- [x] **11.12** Two-column event page layout — description left, ticket/registration widget right (sticky); synthesizes `General Registration` ticket for `free-registration` events; widget visible for both event types
+- [x] **11.13** Sales tax support — `taxName` + `taxRate` (%) in Site Settings → Billing tab; tax calculated on (base + service fee) and stored as `taxAmount` on order; shown as line item in ticket widget preview and on confirmation page; `CurrencyField` admin input bug fixed (was `type="number"` with immediate commit — now `type="text"` with blur-commit so multi-digit values like $10/$20 work correctly)
+- [ ] **11.14** *(Future)* Per-ticket-type tax-inclusive toggle — allow marking a ticket price as already including tax (display embedded tax amount as a note rather than adding it on top). Currently all prices are tax-exclusive and HST is added on top.
 
 ### Testing
 - [x] **11.9** Write integration tests for the checkout → webhook → order creation flow

@@ -55,6 +55,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   if (!event) return <PayloadRedirects url={url} />
 
+  // Read tax config from site settings for the ticket widget price preview
+  const payload = await getPayload({ config: configPromise })
+  const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
+  const siteTaxRate = (siteSettings as Record<string, unknown>).taxRate as number | undefined
+  const siteTaxName = (siteSettings as Record<string, unknown>).taxName as string | undefined
+
   const featuredImageUrl =
     event.featuredImage && typeof event.featuredImage === 'object' && event.featuredImage.url
       ? event.featuredImage.url
@@ -105,36 +111,57 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
         </section>
       )}
 
-      <section className="container">
-        <div className="max-w-3xl">
-          <RichText data={event.description} enableGutter={false} />
+      <section className="container pb-8">
+        {(() => {
+          const isFreeRegistration = event.ticketingType === 'free-registration'
+          const isChamberManaged = event.ticketingType === 'chamber-managed'
+          const syntheticTickets = isFreeRegistration
+            ? [{ name: 'General Registration', price: 0, capacity: event.registrationCapacity ?? 999999 }]
+            : (event.ticketTypes ?? [])
+          const showWidget =
+            isFreeRegistration || (isChamberManaged && syntheticTickets.length > 0)
 
-          {event.ticketingType === 'external-link' && event.externalTicketUrl && (
-            <div className="mt-8">
-              <Link
-                className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium"
-                href={event.externalTicketUrl}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Get Tickets
-              </Link>
+          return (
+            <div
+              className={`grid grid-cols-1 gap-12 items-start ${
+                showWidget ? 'lg:grid-cols-[1fr_380px]' : ''
+              }`}
+            >
+              {/* Left column: description + external CTA */}
+              <div className={!showWidget ? 'max-w-3xl' : ''}>
+                <RichText data={event.description} enableGutter={false} />
+
+                {event.ticketingType === 'external-link' && event.externalTicketUrl && (
+                  <div className="mt-8">
+                    <Link
+                      className="inline-flex items-center px-6 py-3 rounded-md bg-primary text-primary-foreground font-medium"
+                      href={event.externalTicketUrl}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Get Tickets
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Right column: ticket / registration widget */}
+              {showWidget && (
+                <div className="lg:sticky lg:top-24">
+                  <TicketCheckout
+                    eventId={event.id}
+                    eventTitle={event.title}
+                    ticketTypes={syntheticTickets}
+                    serviceFee={event.serviceFee}
+                    stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+                    taxRate={siteTaxRate}
+                    taxName={siteTaxName}
+                  />
+                </div>
+              )}
             </div>
-          )}
-
-          {event.ticketingType === 'chamber-managed' &&
-            event.ticketTypes &&
-            event.ticketTypes.length > 0 &&
-            env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
-              <TicketCheckout
-                eventId={event.id}
-                eventTitle={event.title}
-                ticketTypes={event.ticketTypes}
-                serviceFee={event.serviceFee}
-                stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
-              />
-            )}
-        </div>
+          )
+        })()}
       </section>
     </article>
   )

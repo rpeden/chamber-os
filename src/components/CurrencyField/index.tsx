@@ -1,14 +1,19 @@
 'use client'
 
-import { useField, TextInput, FieldLabel, useFormFields } from '@payloadcms/ui'
+import { useField, FieldLabel } from '@payloadcms/ui'
 import type { NumberFieldClientComponent } from 'payload'
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 /**
  * Custom admin field component for currency amounts.
  *
  * Stores values in minor units (e.g., cents) in the database,
  * but displays and accepts input in major units (e.g., dollars).
+ *
+ * Uses a local string state so the user can freely type multi-digit
+ * values (e.g., "10", "20.50") without the field committing on every
+ * keystroke and mangling the cursor position. The stored value is only
+ * updated on blur or when the input loses focus.
  *
  * The exponent (number of decimal places) is read from the field's
  * custom config (`field.custom.currencyExponent`), defaulting to 2.
@@ -26,28 +31,50 @@ export const CurrencyField: NumberFieldClientComponent = (props) => {
 
   const { value, setValue } = useField<number>({ path })
 
-  // Convert stored minor units to major units for display
-  const displayValue = useMemo(() => {
+  // Local string state — what the user sees while typing
+  const [inputStr, setInputStr] = useState<string>(() => {
     if (value === null || value === undefined || value === 0) return ''
-    return (value / divisor).toFixed(exponent)
-  }, [value, divisor, exponent])
+    return (value / divisor).toString()
+  })
+  const [focused, setFocused] = useState(false)
 
-  // Convert major units input to minor units for storage
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const inputVal = e.target.value
-      if (inputVal === '' || inputVal === null) {
-        setValue(0)
-        return
+  // Sync display when the stored value changes externally (e.g. template fills)
+  // but only when the user isn't actively editing
+  useEffect(() => {
+    if (!focused) {
+      if (value === null || value === undefined || value === 0) {
+        setInputStr('')
+      } else {
+        setInputStr((value / divisor).toString())
       }
-      const parsed = parseFloat(inputVal)
-      if (Number.isNaN(parsed)) return
-      setValue(Math.round(parsed * divisor))
-    },
-    [divisor, setValue],
-  )
+    }
+  }, [value, divisor, focused])
 
-  const step = exponent > 0 ? (1 / divisor).toFixed(exponent) : '1'
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Accept any input — validate on blur
+    setInputStr(e.target.value)
+  }, [])
+
+  const handleFocus = useCallback(() => setFocused(true), [])
+
+  const handleBlur = useCallback(() => {
+    setFocused(false)
+    const cleaned = inputStr.trim()
+    if (cleaned === '' || cleaned === '.') {
+      setValue(0)
+      setInputStr('')
+      return
+    }
+    const parsed = parseFloat(cleaned)
+    if (Number.isNaN(parsed) || parsed < 0) {
+      // Revert to the last stored value
+      setInputStr(value ? (value / divisor).toString() : '')
+      return
+    }
+    const minorUnits = Math.round(parsed * divisor)
+    setValue(minorUnits)
+    setInputStr((minorUnits / divisor).toString())
+  }, [inputStr, value, divisor, setValue])
 
   return (
     <div className="field-type number">
@@ -68,13 +95,15 @@ export const CurrencyField: NumberFieldClientComponent = (props) => {
           {currencySymbol}
         </span>
         <input
-          type="number"
+          type="text"
+          inputMode="decimal"
           id={`field-${path}`}
           name={path}
-          value={displayValue}
+          value={inputStr}
           onChange={handleChange}
-          min={field.min !== undefined ? field.min / divisor : undefined}
-          step={step}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          placeholder={`0.${'0'.repeat(exponent)}`}
           style={{ paddingLeft: '28px', width: '100%' }}
           className="field-type__input"
         />

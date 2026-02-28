@@ -269,6 +269,46 @@ export const SiteSettings: GlobalConfig = {
             },
           ],
         },
+
+        // ──────────────────────────────────────────
+        // Tab: Billing
+        // ──────────────────────────────────────────
+        {
+          label: 'Billing',
+          description: 'Tax configuration applied to all ticket and membership purchases.',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'taxName',
+                  type: 'text',
+                  label: 'Tax Name',
+                  defaultValue: '',
+                  admin: {
+                    description:
+                      'Name of the applicable tax (e.g., "HST", "GST", "VAT"). Leave blank if no tax applies.',
+                    width: '50%',
+                    placeholder: 'e.g. HST',
+                  },
+                },
+                {
+                  name: 'taxRate',
+                  type: 'number',
+                  label: 'Tax Rate (%)',
+                  defaultValue: 0,
+                  min: 0,
+                  max: 100,
+                  admin: {
+                    description:
+                      'Tax percentage applied to ticket price + service fee (e.g., enter 15 for 15% HST). Set to 0 to disable.',
+                    width: '50%',
+                  },
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

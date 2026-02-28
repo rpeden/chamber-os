@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
@@ -34,13 +35,18 @@ interface TicketCheckoutProps {
   eventTitle: string
   ticketTypes: TicketType[]
   serviceFee?: ServiceFee | null
-  stripePublishableKey: string
+  stripePublishableKey?: string
+  /** Tax rate as a percentage (e.g. 15 for 15% HST). 0 = no tax. */
+  taxRate?: number
+  /** Tax name for display (e.g. 'HST'). */
+  taxName?: string
 }
 
 /**
- * Format minor units (cents) to display dollars.
+ * Format minor units (cents) to display dollars. Returns 'Free' for zero.
  */
 function formatPrice(minorUnits: number): string {
+  if (minorUnits === 0) return 'Free'
   return new Intl.NumberFormat('en-CA', {
     style: 'currency',
     currency: 'CAD',
@@ -64,18 +70,21 @@ function previewServiceFee(baseAmount: number, fee?: ServiceFee | null): number 
 interface TicketSelectorProps {
   ticketTypes: TicketType[]
   serviceFee?: ServiceFee | null
+  taxRate?: number
+  taxName?: string
   onCheckout: (ticketType: string, quantity: number) => void
   loading: boolean
 }
 
-function TicketSelector({ ticketTypes, serviceFee, onCheckout, loading }: TicketSelectorProps) {
+function TicketSelector({ ticketTypes, serviceFee, taxRate, taxName, onCheckout, loading }: TicketSelectorProps) {
   const [selectedType, setSelectedType] = useState<string>(ticketTypes[0]?.name ?? '')
   const [quantity, setQuantity] = useState(1)
 
   const selectedTicket = ticketTypes.find((t) => t.name === selectedType)
   const baseAmount = (selectedTicket?.price ?? 0) * quantity
   const feeAmount = previewServiceFee(baseAmount, serviceFee)
-  const totalAmount = baseAmount + feeAmount
+  const taxAmount = taxRate && taxRate > 0 ? Math.floor((baseAmount + feeAmount) * (taxRate / 100)) : 0
+  const totalAmount = baseAmount + feeAmount + taxAmount
 
   const now = new Date()
   const isOnSale = (ticket: TicketType) => {
@@ -164,6 +173,12 @@ function TicketSelector({ ticketTypes, serviceFee, onCheckout, loading }: Ticket
             <span>{formatPrice(feeAmount)}</span>
           </div>
         )}
+        {taxAmount > 0 && (
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{taxName || 'Tax'}</span>
+            <span>{formatPrice(taxAmount)}</span>
+          </div>
+        )}
         <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
           <span>Total</span>
           <span>{formatPrice(totalAmount)}</span>
@@ -176,7 +191,11 @@ function TicketSelector({ ticketTypes, serviceFee, onCheckout, loading }: Ticket
         disabled={loading || !selectedTicket || !isOnSale(selectedTicket)}
         className="w-full rounded-md bg-primary px-6 py-3 text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? 'Processing...' : 'Proceed to Payment'}
+        {loading
+          ? 'Processing...'
+          : selectedTicket?.price === 0
+            ? 'Register for Free'
+            : 'Proceed to Payment'}
       </button>
     </div>
   )
@@ -243,10 +262,14 @@ export function TicketCheckout({
   ticketTypes,
   serviceFee,
   stripePublishableKey,
+  taxRate,
+  taxName: taxNameProp,
 }: TicketCheckoutProps) {
   const [phase, setPhase] = useState<CheckoutPhase>('select')
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [totalAmount, setTotalAmount] = useState(0)
+  const [taxAmount, setTaxAmount] = useState(0)
+  const [taxName, setTaxName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [purchaserName, setPurchaserName] = useState('')
@@ -254,6 +277,9 @@ export function TicketCheckout({
   const [showContactForm, setShowContactForm] = useState(false)
   const [selectedTicketType, setSelectedTicketType] = useState('')
   const [selectedQuantity, setSelectedQuantity] = useState(1)
+
+  const router = useRouter()
+  const isFree = (ticketTypes.find((t) => t.name === selectedTicketType)?.price ?? 0) === 0
 
   const handleCheckout = useCallback(
     (ticketType: string, quantity: number) => {
@@ -270,7 +296,42 @@ export function TicketCheckout({
       setLoading(true)
       setError(null)
 
+      const selectedTicket = ticketTypes.find((t) => t.name === selectedTicketType)
+      const isTicketFree = (selectedTicket?.price ?? 0) === 0
+
       try {
+        if (isTicketFree) {
+          const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventId,
+              ticketType: selectedTicketType,
+              quantity: selectedQuantity,
+              purchaserName,
+              purchaserEmail,
+            }),
+          })
+
+          const data = await res.json()
+
+          if (!res.ok) {
+            setError(data.error ?? 'Registration failed')
+            setLoading(false)
+            return
+          }
+
+          router.push(`/events/checkout/confirmation?token=${data.qrToken}`)
+          return
+        }
+
+        // Paid path — require Stripe
+        if (!stripePublishableKey) {
+          setError('Payment configuration error. Please contact us to register.')
+          setLoading(false)
+          return
+        }
+
         const res = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -293,6 +354,8 @@ export function TicketCheckout({
 
         setClientSecret(data.clientSecret)
         setTotalAmount(data.totalAmount)
+        setTaxAmount(data.taxAmount ?? 0)
+        setTaxName(data.taxName ?? '')
         setPhase('payment')
       } catch {
         setError('Network error — please try again')
@@ -300,11 +363,11 @@ export function TicketCheckout({
         setLoading(false)
       }
     },
-    [eventId, selectedTicketType, selectedQuantity, purchaserName, purchaserEmail],
+    [eventId, selectedTicketType, selectedQuantity, purchaserName, purchaserEmail, ticketTypes, stripePublishableKey, router],
   )
 
   const stripePromise = React.useMemo(
-    () => loadStripe(stripePublishableKey),
+    () => (stripePublishableKey ? loadStripe(stripePublishableKey) : null),
     [stripePublishableKey],
   )
 
@@ -327,6 +390,8 @@ export function TicketCheckout({
         <TicketSelector
           ticketTypes={ticketTypes}
           serviceFee={serviceFee}
+          taxRate={taxRate}
+          taxName={taxNameProp}
           onCheckout={handleCheckout}
           loading={loading}
         />
@@ -376,13 +441,19 @@ export function TicketCheckout({
               disabled={loading || !purchaserName || !purchaserEmail}
               className="w-full rounded-md bg-primary px-6 py-3 text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Setting up payment...' : 'Continue to Payment'}
+              {loading
+                ? isFree
+                  ? 'Registering...'
+                  : 'Setting up payment...'
+                : isFree
+                  ? 'Register'
+                  : 'Continue to Payment'}
             </button>
           </form>
         </div>
       )}
 
-      {phase === 'payment' && clientSecret && (
+      {phase === 'payment' && clientSecret && stripePromise && (
         <div>
           <button
             type="button"

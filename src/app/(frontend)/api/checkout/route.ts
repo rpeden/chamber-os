@@ -45,6 +45,8 @@ export async function POST(req: Request): Promise<Response> {
       paymentIntentId: result.paymentIntentId,
       baseAmount: result.baseAmount,
       serviceFeeAmount: result.serviceFeeAmount,
+      taxAmount: result.taxAmount,
+      taxName: result.taxName,
       totalAmount: result.totalAmount,
     })
   } catch (err) {

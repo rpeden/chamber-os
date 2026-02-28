@@ -20,11 +20,15 @@ export interface CreatePaymentIntentInput {
 export interface PaymentIntentResult {
   clientSecret: string
   paymentIntentId: string
-  /** Base ticket cost in minor units (price × quantity, before fee) */
+  /** Base ticket cost in minor units (price × quantity, before fee or tax) */
   baseAmount: number
   /** Service fee in minor units */
   serviceFeeAmount: number
-  /** Total charged in minor units (base + fee) */
+  /** Tax amount in minor units (0 if no tax configured) */
+  taxAmount: number
+  /** Tax name as configured in Site Settings (e.g. 'HST'), empty string if none */
+  taxName: string
+  /** Total charged in minor units (base + fee + tax) */
   totalAmount: number
 }
 
@@ -113,7 +117,16 @@ export async function createPaymentIntent(
   // ticket.price is in minor units (cents) thanks to currencyField
   const baseAmount = ticket.price * quantity
   const serviceFeeAmount = calculateServiceFee(baseAmount, event.serviceFee)
-  const totalAmount = baseAmount + serviceFeeAmount
+
+  // Read tax rate from Site Settings
+  const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
+  const taxRate: number = (siteSettings as Record<string, unknown>).taxRate as number ?? 0
+  const taxName: string = ((siteSettings as Record<string, unknown>).taxName as string) ?? ''
+  const taxAmount = taxRate > 0
+    ? Math.floor((baseAmount + serviceFeeAmount) * (taxRate / 100))
+    : 0
+
+  const totalAmount = baseAmount + serviceFeeAmount + taxAmount
 
   // --- Create Stripe Payment Intent ---
   const stripe = getStripe()
@@ -127,6 +140,8 @@ export async function createPaymentIntent(
       ticketType,
       quantity: String(quantity),
       purchaserEmail,
+      taxAmount: String(taxAmount),
+      taxName,
     },
     receipt_email: purchaserEmail,
     description: `${event.title} — ${quantity}× ${ticketType}`,
@@ -145,6 +160,7 @@ export async function createPaymentIntent(
       stripePaymentIntentId: paymentIntent.id,
       totalAmount,
       serviceFeeAmount,
+      taxAmount,
       status: 'pending',
     },
   })
@@ -154,6 +170,8 @@ export async function createPaymentIntent(
     paymentIntentId: paymentIntent.id,
     baseAmount,
     serviceFeeAmount,
+    taxAmount,
+    taxName,
     totalAmount,
   }
 }
