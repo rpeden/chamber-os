@@ -56,7 +56,7 @@ export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url)
   const period = (searchParams.get('period') ?? 'last30') as Period
   const fiscalParam = Number(searchParams.get('fiscal') ?? '1')
-  const fiscalYearStartMonth = fiscalParam >= 1 && fiscalParam <= 12 ? fiscalParam : 1
+  const _fiscalYearStartMonth = fiscalParam >= 1 && fiscalParam <= 12 ? fiscalParam : 1
 
   // Read fiscal year from SiteSettings (canonical source)
   const siteSettings = await payload.findGlobal({ slug: 'site-settings', depth: 0 })

@@ -116,12 +116,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
           {/* Logo — spans full header height, vertically centered */}
           <Link href="/" className="flex items-center shrink-0 pt-6 pb-4 pr-8 md:pl-2.5 min-w-0">
             {logo?.url ? (
-              <span className="relative block h-[92px] w-[368px] max-w-[42vw]">
+              <span className="relative block h-[110px] w-[442px] max-w-[42vw]">
                 <NextImage
                   src={getMediaUrl(logo.url)}
                   alt={logo.alt || siteName}
                   fill
-                  sizes="(min-width: 1280px) 368px, (min-width: 768px) 34vw, 240px"
+                  sizes="(min-width: 1280px) 442px, (min-width: 768px) 38vw, 280px"
                   className="object-contain object-left"
                   priority
                 />
@@ -253,12 +253,12 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({
         <div className="flex min-[1091px]:hidden justify-between items-center py-3">
           <Link href="/" className="flex items-center shrink-0 min-w-0">
             {logo?.url ? (
-              <span className="relative block h-14 w-[220px] max-w-[70vw]">
+              <span className="relative block h-[67px] w-[264px] max-w-[70vw]">
                 <NextImage
                   src={getMediaUrl(logo.url)}
                   alt={logo.alt || siteName}
                   fill
-                  sizes="220px"
+                  sizes="264px"
                   className="object-contain object-left"
                   priority
                 />

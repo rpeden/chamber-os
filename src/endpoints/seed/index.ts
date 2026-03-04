@@ -103,8 +103,15 @@ export const seed = async ({
   )
 
   // Delete all documents from collections
+  // FK-dependent collections first (members/orders → contacts)
+  for (const collection of ['orders', 'members', 'membership-tiers', 'audit-log'] as const) {
+    await payload.db.deleteMany({ collection, req, where: {} })
+  }
+
   await Promise.all(
-    collections.map((collection) => payload.db.deleteMany({ collection, req, where: {} })),
+    collections
+      .filter((c) => !['orders', 'members', 'membership-tiers', 'audit-log'].includes(c))
+      .map((collection) => payload.db.deleteMany({ collection, req, where: {} })),
   )
 
   // Delete all version history too

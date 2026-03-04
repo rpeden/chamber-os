@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import type { Where } from 'payload'
 import config from '@payload-config'
@@ -140,53 +141,53 @@ const BeforeDashboard: React.FC = async () => {
 
       {/* At-a-glance stats */}
       <div className={`${baseClass}__stats`}>
-        <a href="/admin/collections/members" className={`${baseClass}__stat`}>
+        <Link href="/admin/collections/members" className={`${baseClass}__stat`}>
           <span className={`${baseClass}__stat-value`}>{activeCount.totalDocs}</span>
           <span className={`${baseClass}__stat-label`}>Active Members</span>
-        </a>
+        </Link>
         {overdueCount.totalDocs > 0 && (
-          <a
+          <Link
             href={`/admin/collections/members?where[and][0][status][equals]=active&where[and][1][renewalDate][less_than]=${encodeURIComponent(now)}`}
             className={`${baseClass}__stat ${baseClass}__stat--warning`}
           >
             <span className={`${baseClass}__stat-value`}>{overdueCount.totalDocs}</span>
             <span className={`${baseClass}__stat-label`}>Overdue</span>
-          </a>
+          </Link>
         )}
         {lapsedCount.totalDocs > 0 && (
-          <a href="/admin/collections/members?where[status][equals]=lapsed" className={`${baseClass}__stat ${baseClass}__stat--muted`}>
+          <Link href="/admin/collections/members?where[status][equals]=lapsed" className={`${baseClass}__stat ${baseClass}__stat--muted`}>
             <span className={`${baseClass}__stat-value`}>{lapsedCount.totalDocs}</span>
             <span className={`${baseClass}__stat-label`}>Lapsed</span>
-          </a>
+          </Link>
         )}
-        <a href="/admin/collections/events" className={`${baseClass}__stat`}>
+        <Link href="/admin/collections/events" className={`${baseClass}__stat`}>
           <span className={`${baseClass}__stat-value`}>{eventCount.totalDocs}</span>
           <span className={`${baseClass}__stat-label`}>Upcoming Events</span>
-        </a>
-        <a href="/admin/collections/posts" className={`${baseClass}__stat`}>
+        </Link>
+        <Link href="/admin/collections/posts" className={`${baseClass}__stat`}>
           <span className={`${baseClass}__stat-value`}>{postCount.totalDocs}</span>
           <span className={`${baseClass}__stat-label`}>Published Posts</span>
-        </a>
-        <a href="/admin/collections/pages" className={`${baseClass}__stat`}>
+        </Link>
+        <Link href="/admin/collections/pages" className={`${baseClass}__stat`}>
           <span className={`${baseClass}__stat-value`}>{pageCount.totalDocs}</span>
           <span className={`${baseClass}__stat-label`}>Published Pages</span>
-        </a>
+        </Link>
       </div>
 
       {/* Quick actions */}
       <div className={`${baseClass}__actions`}>
-        <a href="/admin/collections/members/create" className={`${baseClass}__action`}>
+        <Link href="/admin/collections/members/create" className={`${baseClass}__action`}>
           + New Member
-        </a>
-        <a href="/admin/collections/events/create" className={`${baseClass}__action`}>
+        </Link>
+        <Link href="/admin/collections/events/create" className={`${baseClass}__action`}>
           + New Event
-        </a>
-        <a href="/admin/collections/posts/create" className={`${baseClass}__action`}>
+        </Link>
+        <Link href="/admin/collections/posts/create" className={`${baseClass}__action`}>
           + New Post
-        </a>
-        <a href="/admin/collections/pages/create" className={`${baseClass}__action`}>
+        </Link>
+        <Link href="/admin/collections/pages/create" className={`${baseClass}__action`}>
           + New Page
-        </a>
+        </Link>
       </div>
 
       {/* Content panels */}
@@ -196,17 +197,17 @@ const BeforeDashboard: React.FC = async () => {
           <div className={`${baseClass}__panel`}>
             <div className={`${baseClass}__panel-header`}>
               <h3>Members by Tier</h3>
-              <a href="/admin/collections/members" className={`${baseClass}__view-all`}>
+              <Link href="/admin/collections/members" className={`${baseClass}__view-all`}>
                 View All →
-              </a>
+              </Link>
             </div>
             <ul className={`${baseClass}__list`}>
               {tierCounts.map((tier) => (
                 <li key={tier.name} className={`${baseClass}__list-item`}>
-                  <a href={`/admin/collections/members`}>
+                  <Link href="/admin/collections/members">
                     <span className={`${baseClass}__list-title`}>{tier.name}</span>
                     <span className={`${baseClass}__tier-count`}>{tier.count}</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -217,9 +218,9 @@ const BeforeDashboard: React.FC = async () => {
         <div className={`${baseClass}__panel`}>
           <div className={`${baseClass}__panel-header`}>
             <h3>Upcoming Events</h3>
-            <a href="/admin/collections/events" className={`${baseClass}__view-all`}>
+            <Link href="/admin/collections/events" className={`${baseClass}__view-all`}>
               View All →
-            </a>
+            </Link>
           </div>
           {upcomingEvents.docs.length === 0 ? (
             <p className={`${baseClass}__empty`}>No upcoming events.</p>
@@ -227,13 +228,13 @@ const BeforeDashboard: React.FC = async () => {
             <ul className={`${baseClass}__list`}>
               {upcomingEvents.docs.map((event) => (
                 <li key={event.id} className={`${baseClass}__list-item`}>
-                  <a href={`/admin/collections/events/${event.id}`}>
+                  <Link href={`/admin/collections/events/${event.id}`}>
                     <span className={`${baseClass}__list-title`}>{event.title}</span>
                     <span className={`${baseClass}__list-meta`}>
                       {formatDate(event.startDate)}
                       {event.location ? ` · ${event.location}` : ''}
                     </span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -244,9 +245,9 @@ const BeforeDashboard: React.FC = async () => {
         <div className={`${baseClass}__panel`}>
           <div className={`${baseClass}__panel-header`}>
             <h3>Recent News</h3>
-            <a href="/admin/collections/posts" className={`${baseClass}__view-all`}>
+            <Link href="/admin/collections/posts" className={`${baseClass}__view-all`}>
               View All →
-            </a>
+            </Link>
           </div>
           {recentPosts.docs.length === 0 ? (
             <p className={`${baseClass}__empty`}>No published posts yet.</p>
@@ -254,10 +255,10 @@ const BeforeDashboard: React.FC = async () => {
             <ul className={`${baseClass}__list`}>
               {recentPosts.docs.map((post) => (
                 <li key={post.id} className={`${baseClass}__list-item`}>
-                  <a href={`/admin/collections/posts/${post.id}`}>
+                  <Link href={`/admin/collections/posts/${post.id}`}>
                     <span className={`${baseClass}__list-title`}>{post.title}</span>
                     <span className={`${baseClass}__list-meta`}>{formatDate(post.createdAt)}</span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

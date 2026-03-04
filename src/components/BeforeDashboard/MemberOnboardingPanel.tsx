@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
+import Link from 'next/link'
 
 type Option = {
   id: number | string
@@ -136,9 +137,9 @@ export function MemberOnboardingPanel({ tiers, organizations, people }: Props) {
     <div className="chamber-dashboard__panel chamber-dashboard__panel--onboarding">
       <div className="chamber-dashboard__panel-header">
         <h3>Member Onboarding</h3>
-        <a href="/admin/collections/members" className="chamber-dashboard__view-all">
+        <Link href="/admin/collections/members" className="chamber-dashboard__view-all">
           Members →
-        </a>
+        </Link>
       </div>
 
       <div className="chamber-dashboard__onboarding-mode">
