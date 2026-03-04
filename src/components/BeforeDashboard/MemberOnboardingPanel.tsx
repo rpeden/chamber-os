@@ -135,7 +135,7 @@ export function MemberOnboardingPanel({ tiers, organizations, people }: Props) {
   return (
     <div className="chamber-dashboard__panel chamber-dashboard__panel--onboarding">
       <div className="chamber-dashboard__panel-header">
-        <h3>Staff Onboarding</h3>
+        <h3>Member Onboarding</h3>
         <a href="/admin/collections/members" className="chamber-dashboard__view-all">
           Members →
         </a>

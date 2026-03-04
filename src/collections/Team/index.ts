@@ -21,7 +21,7 @@ export const Team: CollectionConfig<'team'> = {
     update: authenticated,
   },
   admin: {
-    group: 'Settings',
+    group: 'Chamber Management',
     defaultColumns: ['name', 'title', 'type', 'status', 'displayOrder'],
     useAsTitle: 'name',
   },

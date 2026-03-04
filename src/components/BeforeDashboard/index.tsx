@@ -2,7 +2,6 @@ import React from 'react'
 import { getPayload } from 'payload'
 import type { Where } from 'payload'
 import config from '@payload-config'
-import { MemberOnboardingPanel } from './MemberOnboardingPanel'
 
 import './index.scss'
 
@@ -49,8 +48,6 @@ const BeforeDashboard: React.FC = async () => {
     lapsedCount,
     overdueCount,
     tierBreakdown,
-    organizationContacts,
-    personContacts,
   ] = await Promise.all([
     payload.find({
       collection: 'events',
@@ -106,22 +103,6 @@ const BeforeDashboard: React.FC = async () => {
       collection: 'membership-tiers',
       sort: 'displayOrder',
       limit: 20,
-      select: { name: true },
-      depth: 0,
-    }),
-    payload.find({
-      collection: 'contacts',
-      sort: 'name',
-      limit: 200,
-      where: { type: { equals: 'organization' } },
-      select: { name: true },
-      depth: 0,
-    }),
-    payload.find({
-      collection: 'contacts',
-      sort: 'name',
-      limit: 300,
-      where: { type: { equals: 'person' } },
       select: { name: true },
       depth: 0,
     }),
@@ -207,15 +188,6 @@ const BeforeDashboard: React.FC = async () => {
           + New Page
         </a>
       </div>
-
-      <MemberOnboardingPanel
-        tiers={tierBreakdown.docs.map((tier) => ({ id: tier.id, name: tier.name }))}
-        organizations={organizationContacts.docs.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-        }))}
-        people={personContacts.docs.map((contact) => ({ id: contact.id, name: contact.name }))}
-      />
 
       {/* Content panels */}
       <div className={`${baseClass}__panels`}>

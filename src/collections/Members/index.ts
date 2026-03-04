@@ -62,6 +62,9 @@ export const Members: CollectionConfig = {
     useAsTitle: 'title',
     description:
       'Use column header filters to view members by status (e.g., "lapsed", "cancelled") or by tier. Click column headers to sort.',
+    components: {
+      beforeList: ['@/components/admin/MembersBeforeList'],
+    },
   },
   fields: [
     // Virtual title field — populated by afterRead hook from the linked contact's name

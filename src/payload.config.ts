@@ -29,6 +29,7 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
+    theme: 'light',
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
@@ -87,22 +88,28 @@ export default buildConfig({
     },
   }),
   collections: [
+    // Members & Contacts
+    Members,
+    Contacts,
+    MembershipTiers,
+    // Content
     Pages,
     Posts,
-    Events,
-    EventTemplates,
-    Team,
     Media,
     Categories,
-    Contacts,
-    Members,
-    MembershipTiers,
+    // Events
+    Events,
+    EventTemplates,
+    // Purchases
     Orders,
+    // Chamber Management
+    Team,
     AuditLog,
+    // Settings
     Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer, SiteSettings],
+  globals: [SiteSettings, Header, Footer],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

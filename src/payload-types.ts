@@ -67,17 +67,17 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    members: Member;
+    contacts: Contact;
+    'membership-tiers': MembershipTier;
     pages: Page;
     posts: Post;
-    events: Event;
-    'event-templates': EventTemplate;
-    team: Team;
     media: Media;
     categories: Category;
-    contacts: Contact;
-    members: Member;
-    'membership-tiers': MembershipTier;
+    events: Event;
+    'event-templates': EventTemplate;
     orders: Order;
+    team: Team;
     'audit-log': AuditLog;
     users: User;
     redirects: Redirect;
@@ -97,17 +97,17 @@ export interface Config {
     };
   };
   collectionsSelect: {
+    members: MembersSelect<false> | MembersSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    'membership-tiers': MembershipTiersSelect<false> | MembershipTiersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    events: EventsSelect<false> | EventsSelect<true>;
-    'event-templates': EventTemplatesSelect<false> | EventTemplatesSelect<true>;
-    team: TeamSelect<false> | TeamSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
-    contacts: ContactsSelect<false> | ContactsSelect<true>;
-    members: MembersSelect<false> | MembersSelect<true>;
-    'membership-tiers': MembershipTiersSelect<false> | MembershipTiersSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'event-templates': EventTemplatesSelect<false> | EventTemplatesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -126,14 +126,14 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
+    'site-settings': SiteSetting;
     header: Header;
     footer: Footer;
-    'site-settings': SiteSetting;
   };
   globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   user: User;
@@ -165,6 +165,186 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * Use column header filters to view members by status (e.g., "lapsed", "cancelled") or by tier. Click column headers to sort.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members".
+ */
+export interface Member {
+  id: number;
+  title?: string | null;
+  /**
+   * The entity that IS the member — an organization or a person Contact.
+   */
+  contact: number | Contact;
+  /**
+   * The go-to human for this membership. Used when the member is an organization — link the main contact person here.
+   */
+  primaryContact?: (number | null) | Contact;
+  /**
+   * The membership tier this member is subscribed to.
+   */
+  membershipTier?: (number | null) | MembershipTier;
+  /**
+   * Membership status. In production, transitions should go through MembershipService for audit logging.
+   */
+  status: 'pending' | 'active' | 'lapsed' | 'cancelled' | 'reinstated';
+  /**
+   * Date the membership began.
+   */
+  joinedDate?: string | null;
+  /**
+   * Next renewal date for this membership.
+   */
+  renewalDate?: string | null;
+  /**
+   * Stripe Customer ID for billing integration.
+   */
+  stripeCustomerId?: string | null;
+  /**
+   * Xero Contact ID for accounting sync. Lives on the Member (the billable entity), not the Contact.
+   */
+  xeroContactId?: string | null;
+  /**
+   * Internal notes about this membership. Not visible to the member.
+   */
+  notes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  /**
+   * Full name of the person, or the organization name.
+   */
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  /**
+   * Is this contact a person or an organization? Members can be either type.
+   */
+  type: 'person' | 'organization';
+  /**
+   * If this person belongs to an organization, link the org Contact here.
+   */
+  organization?: (number | null) | Contact;
+  address?: {
+    street?: string | null;
+    city?: string | null;
+    province?: string | null;
+    postalCode?: string | null;
+  };
+  /**
+   * Flexible tags for categorizing contacts (e.g., vendor, municipal, media, prospect).
+   */
+  tags?:
+    | {
+        tag: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Full URL including https://
+   */
+  website?: string | null;
+  socialLinks?: {
+    facebook?: string | null;
+    linkedin?: string | null;
+    instagram?: string | null;
+    x?: string | null;
+  };
+  /**
+   * Internal notes about this contact. Not shown publicly.
+   */
+  notes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-tiers".
+ */
+export interface MembershipTier {
+  id: number;
+  /**
+   * Tier name shown publicly (e.g., "Gold", "Platinum").
+   */
+  name: string;
+  /**
+   * Annual membership price. Enter in dollars (stored in minor units internally).
+   */
+  annualPrice: number;
+  /**
+   * Detailed tier description for the public-facing pricing page.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * List of features/benefits included in this tier.
+   */
+  features?:
+    | {
+        feature: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Controls the order tiers appear on the pricing page. Lower numbers appear first.
+   */
+  displayOrder?: number | null;
+  /**
+   * Stripe Price ID for automated billing. Leave blank until Stripe integration is configured.
+   */
+  stripePriceId?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1208,58 +1388,6 @@ export interface MembershipTiersBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "membership-tiers".
- */
-export interface MembershipTier {
-  id: number;
-  /**
-   * Tier name shown publicly (e.g., "Gold", "Platinum").
-   */
-  name: string;
-  /**
-   * Annual membership price. Enter in dollars (stored in minor units internally).
-   */
-  annualPrice: number;
-  /**
-   * Detailed tier description for the public-facing pricing page.
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * List of features/benefits included in this tier.
-   */
-  features?:
-    | {
-        feature: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Controls the order tiers appear on the pricing page. Lower numbers appear first.
-   */
-  displayOrder?: number | null;
-  /**
-   * Stripe Price ID for automated billing. Leave blank until Stripe integration is configured.
-   */
-  stripePriceId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
@@ -1680,172 +1808,6 @@ export interface EventTemplate {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team".
- */
-export interface Team {
-  id: number;
-  name: string;
-  title: string;
-  bio?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  headshot?: (number | null) | Media;
-  type: 'staff' | 'board';
-  /**
-   * Lower numbers appear first. Use this to control the order staff and board members are shown.
-   */
-  displayOrder: number;
-  email?: string | null;
-  /**
-   * Full LinkedIn profile URL (e.g., https://linkedin.com/in/janedoe).
-   */
-  linkedin?: string | null;
-  status: 'draft' | 'published';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacts".
- */
-export interface Contact {
-  id: number;
-  /**
-   * Full name of the person, or the organization name.
-   */
-  name: string;
-  email?: string | null;
-  phone?: string | null;
-  /**
-   * Is this contact a person or an organization? Members can be either type.
-   */
-  type: 'person' | 'organization';
-  /**
-   * If this person belongs to an organization, link the org Contact here.
-   */
-  organization?: (number | null) | Contact;
-  address?: {
-    street?: string | null;
-    city?: string | null;
-    province?: string | null;
-    postalCode?: string | null;
-  };
-  /**
-   * Flexible tags for categorizing contacts (e.g., vendor, municipal, media, prospect).
-   */
-  tags?:
-    | {
-        tag: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Full URL including https://
-   */
-  website?: string | null;
-  socialLinks?: {
-    facebook?: string | null;
-    linkedin?: string | null;
-    instagram?: string | null;
-    x?: string | null;
-  };
-  /**
-   * Internal notes about this contact. Not shown publicly.
-   */
-  notes?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Use column header filters to view members by status (e.g., "lapsed", "cancelled") or by tier. Click column headers to sort.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members".
- */
-export interface Member {
-  id: number;
-  title?: string | null;
-  /**
-   * The entity that IS the member — an organization or a person Contact.
-   */
-  contact: number | Contact;
-  /**
-   * The go-to human for this membership. Used when the member is an organization — link the main contact person here.
-   */
-  primaryContact?: (number | null) | Contact;
-  /**
-   * The membership tier this member is subscribed to.
-   */
-  membershipTier?: (number | null) | MembershipTier;
-  /**
-   * Membership status. In production, transitions should go through MembershipService for audit logging.
-   */
-  status: 'pending' | 'active' | 'lapsed' | 'cancelled' | 'reinstated';
-  /**
-   * Date the membership began.
-   */
-  joinedDate?: string | null;
-  /**
-   * Next renewal date for this membership.
-   */
-  renewalDate?: string | null;
-  /**
-   * Stripe Customer ID for billing integration.
-   */
-  stripeCustomerId?: string | null;
-  /**
-   * Xero Contact ID for accounting sync. Lives on the Member (the billable entity), not the Contact.
-   */
-  xeroContactId?: string | null;
-  /**
-   * Internal notes about this membership. Not visible to the member.
-   */
-  notes?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
@@ -1892,6 +1854,44 @@ export interface Order {
    * Auto-generated token for QR code ticket validation. Created when order is confirmed.
    */
   qrToken?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  title: string;
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  headshot?: (number | null) | Media;
+  type: 'staff' | 'board';
+  /**
+   * Lower numbers appear first. Use this to control the order staff and board members are shown.
+   */
+  displayOrder: number;
+  email?: string | null;
+  /**
+   * Full LinkedIn profile URL (e.g., https://linkedin.com/in/janedoe).
+   */
+  linkedin?: string | null;
+  status: 'draft' | 'published';
   updatedAt: string;
   createdAt: string;
 }
@@ -2129,24 +2129,24 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'members';
+        value: number | Member;
+      } | null)
+    | ({
+        relationTo: 'contacts';
+        value: number | Contact;
+      } | null)
+    | ({
+        relationTo: 'membership-tiers';
+        value: number | MembershipTier;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
     | ({
         relationTo: 'posts';
         value: number | Post;
-      } | null)
-    | ({
-        relationTo: 'events';
-        value: number | Event;
-      } | null)
-    | ({
-        relationTo: 'event-templates';
-        value: number | EventTemplate;
-      } | null)
-    | ({
-        relationTo: 'team';
-        value: number | Team;
       } | null)
     | ({
         relationTo: 'media';
@@ -2157,20 +2157,20 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
-        relationTo: 'contacts';
-        value: number | Contact;
+        relationTo: 'events';
+        value: number | Event;
       } | null)
     | ({
-        relationTo: 'members';
-        value: number | Member;
-      } | null)
-    | ({
-        relationTo: 'membership-tiers';
-        value: number | MembershipTier;
+        relationTo: 'event-templates';
+        value: number | EventTemplate;
       } | null)
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -2241,6 +2241,80 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "members_select".
+ */
+export interface MembersSelect<T extends boolean = true> {
+  title?: T;
+  contact?: T;
+  primaryContact?: T;
+  membershipTier?: T;
+  status?: T;
+  joinedDate?: T;
+  renewalDate?: T;
+  stripeCustomerId?: T;
+  xeroContactId?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  phone?: T;
+  type?: T;
+  organization?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        province?: T;
+        postalCode?: T;
+      };
+  tags?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  website?: T;
+  socialLinks?:
+    | T
+    | {
+        facebook?: T;
+        linkedin?: T;
+        instagram?: T;
+        x?: T;
+      };
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "membership-tiers_select".
+ */
+export interface MembershipTiersSelect<T extends boolean = true> {
+  name?: T;
+  annualPrice?: T;
+  description?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  displayOrder?: T;
+  stripePriceId?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2728,96 +2802,6 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "events_select".
- */
-export interface EventsSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
-  eventTemplate?: T;
-  location?: T;
-  startDate?: T;
-  endDate?: T;
-  featuredImage?: T;
-  isFeatured?: T;
-  isChambersEvent?: T;
-  status?: T;
-  ticketingType?: T;
-  externalTicketUrl?: T;
-  registrationCapacity?: T;
-  ticketTypes?:
-    | T
-    | {
-        name?: T;
-        description?: T;
-        price?: T;
-        capacity?: T;
-        saleStart?: T;
-        saleEnd?: T;
-        id?: T;
-      };
-  serviceFee?:
-    | T
-    | {
-        feeType?: T;
-        feeAmount?: T;
-      };
-  generateSlug?: T;
-  slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "event-templates_select".
- */
-export interface EventTemplatesSelect<T extends boolean = true> {
-  seriesName?: T;
-  defaultDescription?: T;
-  defaultFeaturedImage?: T;
-  defaultLocation?: T;
-  defaultTicketingType?: T;
-  defaultExternalTicketUrl?: T;
-  defaultRegistrationCapacity?: T;
-  defaultTicketTypes?:
-    | T
-    | {
-        name?: T;
-        description?: T;
-        price?: T;
-        capacity?: T;
-        saleStart?: T;
-        saleEnd?: T;
-        id?: T;
-      };
-  defaultServiceFee?:
-    | T
-    | {
-        feeType?: T;
-        feeAmount?: T;
-      };
-  defaultIsChambersEvent?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team_select".
- */
-export interface TeamSelect<T extends boolean = true> {
-  name?: T;
-  title?: T;
-  bio?: T;
-  headshot?: T;
-  type?: T;
-  displayOrder?: T;
-  email?: T;
-  linkedin?: T;
-  status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -2932,75 +2916,74 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacts_select".
+ * via the `definition` "events_select".
  */
-export interface ContactsSelect<T extends boolean = true> {
-  name?: T;
-  email?: T;
-  phone?: T;
-  type?: T;
-  organization?: T;
-  address?:
-    | T
-    | {
-        street?: T;
-        city?: T;
-        province?: T;
-        postalCode?: T;
-      };
-  tags?:
-    | T
-    | {
-        tag?: T;
-        id?: T;
-      };
-  website?: T;
-  socialLinks?:
-    | T
-    | {
-        facebook?: T;
-        linkedin?: T;
-        instagram?: T;
-        x?: T;
-      };
-  notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members_select".
- */
-export interface MembersSelect<T extends boolean = true> {
+export interface EventsSelect<T extends boolean = true> {
   title?: T;
-  contact?: T;
-  primaryContact?: T;
-  membershipTier?: T;
+  description?: T;
+  eventTemplate?: T;
+  location?: T;
+  startDate?: T;
+  endDate?: T;
+  featuredImage?: T;
+  isFeatured?: T;
+  isChambersEvent?: T;
   status?: T;
-  joinedDate?: T;
-  renewalDate?: T;
-  stripeCustomerId?: T;
-  xeroContactId?: T;
-  notes?: T;
+  ticketingType?: T;
+  externalTicketUrl?: T;
+  registrationCapacity?: T;
+  ticketTypes?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        price?: T;
+        capacity?: T;
+        saleStart?: T;
+        saleEnd?: T;
+        id?: T;
+      };
+  serviceFee?:
+    | T
+    | {
+        feeType?: T;
+        feeAmount?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "membership-tiers_select".
+ * via the `definition` "event-templates_select".
  */
-export interface MembershipTiersSelect<T extends boolean = true> {
-  name?: T;
-  annualPrice?: T;
-  description?: T;
-  features?:
+export interface EventTemplatesSelect<T extends boolean = true> {
+  seriesName?: T;
+  defaultDescription?: T;
+  defaultFeaturedImage?: T;
+  defaultLocation?: T;
+  defaultTicketingType?: T;
+  defaultExternalTicketUrl?: T;
+  defaultRegistrationCapacity?: T;
+  defaultTicketTypes?:
     | T
     | {
-        feature?: T;
+        name?: T;
+        description?: T;
+        price?: T;
+        capacity?: T;
+        saleStart?: T;
+        saleEnd?: T;
         id?: T;
       };
-  displayOrder?: T;
-  stripePriceId?: T;
+  defaultServiceFee?:
+    | T
+    | {
+        feeType?: T;
+        feeAmount?: T;
+      };
+  defaultIsChambersEvent?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3021,6 +3004,23 @@ export interface OrdersSelect<T extends boolean = true> {
   taxAmount?: T;
   status?: T;
   qrToken?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  title?: T;
+  bio?: T;
+  headshot?: T;
+  type?: T;
+  displayOrder?: T;
+  email?: T;
+  linkedin?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3339,6 +3339,122 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Manage your site branding, contact information, social links, and theme colors.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Displayed in the browser tab and fallback header text.
+   */
+  siteName: string;
+  /**
+   * Main site logo. Recommended: SVG or transparent PNG, at least 200px wide.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * A short tagline shown below the logo or in the hero area.
+   */
+  tagline?: string | null;
+  /**
+   * Currency used for all pricing — membership tiers, event tickets, etc. All amounts are stored in minor units (e.g., cents) and displayed in the chosen currency.
+   */
+  currency: 'CAD' | 'USD';
+  /**
+   * Full mailing address. Line breaks are preserved.
+   */
+  address?: string | null;
+  /**
+   * Main phone number (displayed as-is).
+   */
+  phone?: string | null;
+  /**
+   * General contact email address.
+   */
+  email?: string | null;
+  /**
+   * Add links to your social media profiles.
+   */
+  socialLinks?:
+    | {
+        platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin' | 'youtube' | 'tiktok';
+        /**
+         * Full URL (e.g., https://facebook.com/yourchamber)
+         */
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Main brand color (hex). Used for headers, buttons, and accents.
+   */
+  primaryColor: string;
+  /**
+   * Secondary brand color (hex). Used for hover states and backgrounds.
+   */
+  secondaryColor: string;
+  /**
+   * Accent color (hex). Used for highlights and call-to-action buttons.
+   */
+  accentColor: string;
+  /**
+   * Font family for headings (h1–h6).
+   */
+  headingFont:
+    | 'system-ui, -apple-system, sans-serif'
+    | 'var(--font-geist-sans), sans-serif'
+    | "'Inter', sans-serif"
+    | "'Lora', serif"
+    | "'Merriweather', serif"
+    | "var(--font-montserrat), 'Montserrat', sans-serif"
+    | "'Open Sans', sans-serif"
+    | "'Playfair Display', serif"
+    | "'Raleway', sans-serif"
+    | "'Roboto', sans-serif";
+  /**
+   * Font family for body text.
+   */
+  bodyFont:
+    | 'system-ui, -apple-system, sans-serif'
+    | 'var(--font-geist-sans), sans-serif'
+    | "'Inter', sans-serif"
+    | "'Lora', serif"
+    | "'Merriweather', serif"
+    | "var(--font-montserrat), 'Montserrat', sans-serif"
+    | "'Open Sans', sans-serif"
+    | "'Playfair Display', serif"
+    | "'Raleway', sans-serif"
+    | "'Roboto', sans-serif";
+  /**
+   * Google Analytics 4 measurement ID (e.g., G-XXXXXXXXXX). Leave empty to disable.
+   */
+  gaId?: string | null;
+  /**
+   * GTM container ID (e.g., GTM-XXXXXXX). Leave empty to disable.
+   */
+  gtmId?: string | null;
+  /**
+   * Custom HTML/scripts injected into <head>. Use for third-party tracking pixels, meta tags, etc. Be careful — bad scripts can break the site.
+   */
+  customHeadScripts?: string | null;
+  /**
+   * Name of the applicable tax (e.g., "HST", "GST", "VAT"). Leave blank if no tax applies.
+   */
+  taxName?: string | null;
+  /**
+   * Tax percentage applied to ticket price + service fee (e.g., enter 15 for 15% HST). Set to 0 to disable.
+   */
+  taxRate?: number | null;
+  /**
+   * First month of your fiscal year. Used for revenue reporting periods in the Orders dashboard. Most chambers use January (calendar year) or April (federal fiscal year).
+   */
+  fiscalYearStartMonth: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12';
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
@@ -3485,120 +3601,38 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
- * Manage your site branding, contact information, social links, and theme colors.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
+ * via the `definition` "site-settings_select".
  */
-export interface SiteSetting {
-  id: number;
-  /**
-   * Displayed in the browser tab and fallback header text.
-   */
-  siteName: string;
-  /**
-   * Main site logo. Recommended: SVG or transparent PNG, at least 200px wide.
-   */
-  logo?: (number | null) | Media;
-  /**
-   * A short tagline shown below the logo or in the hero area.
-   */
-  tagline?: string | null;
-  /**
-   * Currency used for all pricing — membership tiers, event tickets, etc. All amounts are stored in minor units (e.g., cents) and displayed in the chosen currency.
-   */
-  currency: 'CAD' | 'USD';
-  /**
-   * Full mailing address. Line breaks are preserved.
-   */
-  address?: string | null;
-  /**
-   * Main phone number (displayed as-is).
-   */
-  phone?: string | null;
-  /**
-   * General contact email address.
-   */
-  email?: string | null;
-  /**
-   * Add links to your social media profiles.
-   */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  logo?: T;
+  tagline?: T;
+  currency?: T;
+  address?: T;
+  phone?: T;
+  email?: T;
   socialLinks?:
+    | T
     | {
-        platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin' | 'youtube' | 'tiktok';
-        /**
-         * Full URL (e.g., https://facebook.com/yourchamber)
-         */
-        url: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Main brand color (hex). Used for headers, buttons, and accents.
-   */
-  primaryColor: string;
-  /**
-   * Secondary brand color (hex). Used for hover states and backgrounds.
-   */
-  secondaryColor: string;
-  /**
-   * Accent color (hex). Used for highlights and call-to-action buttons.
-   */
-  accentColor: string;
-  /**
-   * Font family for headings (h1–h6).
-   */
-  headingFont:
-    | 'system-ui, -apple-system, sans-serif'
-    | 'var(--font-geist-sans), sans-serif'
-    | "'Inter', sans-serif"
-    | "'Lora', serif"
-    | "'Merriweather', serif"
-    | "var(--font-montserrat), 'Montserrat', sans-serif"
-    | "'Open Sans', sans-serif"
-    | "'Playfair Display', serif"
-    | "'Raleway', sans-serif"
-    | "'Roboto', sans-serif";
-  /**
-   * Font family for body text.
-   */
-  bodyFont:
-    | 'system-ui, -apple-system, sans-serif'
-    | 'var(--font-geist-sans), sans-serif'
-    | "'Inter', sans-serif"
-    | "'Lora', serif"
-    | "'Merriweather', serif"
-    | "var(--font-montserrat), 'Montserrat', sans-serif"
-    | "'Open Sans', sans-serif"
-    | "'Playfair Display', serif"
-    | "'Raleway', sans-serif"
-    | "'Roboto', sans-serif";
-  /**
-   * Google Analytics 4 measurement ID (e.g., G-XXXXXXXXXX). Leave empty to disable.
-   */
-  gaId?: string | null;
-  /**
-   * GTM container ID (e.g., GTM-XXXXXXX). Leave empty to disable.
-   */
-  gtmId?: string | null;
-  /**
-   * Custom HTML/scripts injected into <head>. Use for third-party tracking pixels, meta tags, etc. Be careful — bad scripts can break the site.
-   */
-  customHeadScripts?: string | null;
-  /**
-   * Name of the applicable tax (e.g., "HST", "GST", "VAT"). Leave blank if no tax applies.
-   */
-  taxName?: string | null;
-  /**
-   * Tax percentage applied to ticket price + service fee (e.g., enter 15 for 15% HST). Set to 0 to disable.
-   */
-  taxRate?: number | null;
-  /**
-   * First month of your fiscal year. Used for revenue reporting periods in the Orders dashboard. Most chambers use January (calendar year) or April (federal fiscal year).
-   */
-  fiscalYearStartMonth: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12';
-  updatedAt?: string | null;
-  createdAt?: string | null;
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  primaryColor?: T;
+  secondaryColor?: T;
+  accentColor?: T;
+  headingFont?: T;
+  bodyFont?: T;
+  gaId?: T;
+  gtmId?: T;
+  customHeadScripts?: T;
+  taxName?: T;
+  taxRate?: T;
+  fiscalYearStartMonth?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3691,40 +3725,6 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
- */
-export interface SiteSettingsSelect<T extends boolean = true> {
-  siteName?: T;
-  logo?: T;
-  tagline?: T;
-  currency?: T;
-  address?: T;
-  phone?: T;
-  email?: T;
-  socialLinks?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        id?: T;
-      };
-  primaryColor?: T;
-  secondaryColor?: T;
-  accentColor?: T;
-  headingFont?: T;
-  bodyFont?: T;
-  gaId?: T;
-  gtmId?: T;
-  customHeadScripts?: T;
-  taxName?: T;
-  taxRate?: T;
-  fiscalYearStartMonth?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -29,7 +29,7 @@ export const AuditLog: CollectionConfig = {
     delete: () => false,
   },
   admin: {
-    group: 'Settings',
+    group: 'Chamber Management',
     defaultColumns: ['entityType', 'action', 'entityId', 'actorType', 'createdAt'],
   },
   fields: [

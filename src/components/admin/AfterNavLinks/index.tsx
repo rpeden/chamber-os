@@ -19,7 +19,7 @@ export default function AfterNavLinks() {
   const pathname = usePathname()
 
   return (
-    <NavGroup label="Chamber Management">
+    <NavGroup label="Tools">
       {navLinks.map(({ label, href }) => {
         const isActive = pathname === href || pathname.startsWith(`${href}/`)
         return (
