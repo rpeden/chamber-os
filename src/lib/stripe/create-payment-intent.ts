@@ -120,8 +120,8 @@ export async function createPaymentIntent(
 
   // Read tax rate from Site Settings
   const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
-  const taxRate: number = (siteSettings as Record<string, unknown>).taxRate as number ?? 0
-  const taxName: string = ((siteSettings as Record<string, unknown>).taxName as string) ?? ''
+  const taxRate: number = siteSettings.taxRate ?? 0
+  const taxName: string = siteSettings.taxName ?? ''
   const taxAmount = taxRate > 0
     ? Math.floor((baseAmount + serviceFeeAmount) * (taxRate / 100))
     : 0

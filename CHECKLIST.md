@@ -188,11 +188,11 @@ The default Payload admin is functional but looks like a developer tool. Chamber
 - [x] **7.2** At-a-glance stats panel — upcoming events count, published posts count, published pages count (queries run server-side). Members/orders stats are placeholder until Phase 9.
 
 ### Custom Admin Views
-- [ ] **7.3** Register custom views in `payload.config.ts` under `admin.components.views` — these render inside the admin shell (same sidebar, same auth) but with purpose-built UIs
-- [ ] **7.4** **Events Manager view** (`/admin/events-manager`) — calendar/list hybrid showing upcoming events, ticket sales status, quick actions (duplicate event, create from template). Not a replacement for the Events collection CRUD, but a workflow-oriented overview.
-- [ ] **7.5** **CRM Dashboard view** (`/admin/crm`) — member overview with search/filter, membership status breakdown, renewal alerts, recent activity. Queries the Members collection via Local API. _(blocked until Phase 9)_
-- [ ] **7.6** **Orders view** (`/admin/orders-dashboard`) — filterable order list with status, revenue summary, export capability. Purpose-built for staff who need to check ticket sales, not navigate a generic collection list. _(blocked until Phase 9)_
-- [ ] **7.7** Custom sidebar nav group component (`afterNavLinks`) — adds "Chamber Management" section to the sidebar with links to the custom views above
+- [x] **7.3** Register custom views in `payload.config.ts` under `admin.components.views` — these render inside the admin shell (same sidebar, same auth) but with purpose-built UIs
+- [x] **7.4** **Events Manager view** (`/admin/events-manager`) — calendar/list hybrid showing upcoming events, ticket sales status, quick actions (duplicate event, create from template). Not a replacement for the Events collection CRUD, but a workflow-oriented overview.
+- [x] **7.5** **CRM Dashboard view** (`/admin/crm`) — member overview with search/filter, membership status breakdown, renewal alerts, recent activity. Queries the Members collection via Local API. _(blocked until Phase 9)_
+- [x] **7.6** **Orders view** (`/admin/orders-dashboard`) — filterable order list with status, revenue summary, export capability. Purpose-built for staff who need to check ticket sales, not navigate a generic collection list. _(blocked until Phase 9)_
+- [x] **7.7** Custom sidebar nav group component (`afterNavLinks`) — adds "Chamber Management" section to the sidebar with links to the custom views above
 
 ### Collection UX
 - [x] **7.8** Descriptive field labels and `description` help text on every non-obvious field across all collections — no developer jargon, plain English (e.g., "Service Fee" description: "A small fee added to each ticket to cover platform costs. Leave as 'None' if you don't want to charge extra.")
@@ -274,6 +274,10 @@ Payload collections provide storage, admin UI, and typed API. Business logic (li
 - [x] **11.12** Two-column event page layout — description left, ticket/registration widget right (sticky); synthesizes `General Registration` ticket for `free-registration` events; widget visible for both event types
 - [x] **11.13** Sales tax support — `taxName` + `taxRate` (%) in Site Settings → Billing tab; tax calculated on (base + service fee) and stored as `taxAmount` on order; shown as line item in ticket widget preview and on confirmation page; `CurrencyField` admin input bug fixed (was `type="number"` with immediate commit — now `type="text"` with blur-commit so multi-digit values like $10/$20 work correctly)
 - [ ] **11.14** *(Future)* Per-ticket-type tax-inclusive toggle — allow marking a ticket price as already including tax (display embedded tax amount as a note rather than adding it on top). Currently all prices are tax-exclusive and HST is added on top.
+
+### Recurring Membership Billing (Future Phase)
+- [ ] **11.15** *(Future — timing undecided)* Automated membership renewal billing via Stripe Subscriptions or scheduled Payment Intents — annual or monthly billing cycles, grace period handling, dunning emails on failed payment, renewal job triggered on `renewalDate`. Pre-condition: current model relies on Xero for invoicing; this would bring billing into Chamber OS directly. Significant scope — plan as a dedicated phase before starting.
+- [ ] **11.16** *(Future — timing undecided)* Sync membership payment history from Xero into Chamber OS so payments are visible on member records without leaving the admin. Currently all member invoices and payments live in Xero, which is fine — but it's detached. Could be read-only visibility (pull from Xero API on member view) or a periodic sync job that stamps payment records onto the Member document. Decision point: whether to keep Xero as the billing source of truth long-term or migrate that to Chamber OS (ties into 11.15).
 
 ### Testing
 - [x] **11.9** Write integration tests for the checkout → webhook → order creation flow

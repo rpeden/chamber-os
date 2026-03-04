@@ -36,6 +36,21 @@ export default buildConfig({
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeDashboard: ['@/components/BeforeDashboard'],
+      afterNavLinks: ['@/components/admin/AfterNavLinks'],
+      views: {
+        eventsManager: {
+          Component: '@/components/admin/views/EventsManager',
+          path: '/events-manager',
+        },
+        crmDashboard: {
+          Component: '@/components/admin/views/CRMDashboard',
+          path: '/crm',
+        },
+        ordersDashboard: {
+          Component: '@/components/admin/views/OrdersDashboard',
+          path: '/orders-dashboard',
+        },
+      },
     },
     importMap: {
       baseDir: path.resolve(dirname),

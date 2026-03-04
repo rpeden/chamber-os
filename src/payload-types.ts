@@ -3593,6 +3593,10 @@ export interface SiteSetting {
    * Tax percentage applied to ticket price + service fee (e.g., enter 15 for 15% HST). Set to 0 to disable.
    */
   taxRate?: number | null;
+  /**
+   * First month of your fiscal year. Used for revenue reporting periods in the Orders dashboard. Most chambers use January (calendar year) or April (federal fiscal year).
+   */
+  fiscalYearStartMonth: '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12';
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3720,6 +3724,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   customHeadScripts?: T;
   taxName?: T;
   taxRate?: T;
+  fiscalYearStartMonth?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

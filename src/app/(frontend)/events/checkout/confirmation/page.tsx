@@ -191,7 +191,7 @@ export default async function ConfirmationPage({ searchParams: searchParamsPromi
 
   // Read tax name for display (stored amount on order, name from settings)
   const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
-  const confirmedTaxName = ((siteSettings as Record<string, unknown>).taxName as string) || 'Tax'
+  const confirmedTaxName = siteSettings.taxName || 'Tax'
 
   if (!order) {
     return (
@@ -308,11 +308,10 @@ export default async function ConfirmationPage({ searchParams: searchParamsPromi
                 <dd>{formatPrice(order.serviceFeeAmount)}</dd>
               </div>
             )}
-            {typeof (order as Record<string, unknown>).taxAmount === 'number' &&
-              ((order as Record<string, unknown>).taxAmount as number) > 0 && (
+            {typeof order.taxAmount === 'number' && order.taxAmount > 0 && (
               <div className="flex justify-between text-sm">
                 <dt className="text-muted-foreground">{confirmedTaxName}</dt>
-                <dd>{formatPrice((order as Record<string, unknown>).taxAmount as number)}</dd>
+                <dd>{formatPrice(order.taxAmount)}</dd>
               </div>
             )}
             <div className="flex justify-between border-t border-border pt-3">

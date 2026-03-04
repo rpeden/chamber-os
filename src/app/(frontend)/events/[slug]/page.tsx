@@ -58,8 +58,8 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   // Read tax config from site settings for the ticket widget price preview
   const payload = await getPayload({ config: configPromise })
   const siteSettings = await payload.findGlobal({ slug: 'site-settings' })
-  const siteTaxRate = (siteSettings as Record<string, unknown>).taxRate as number | undefined
-  const siteTaxName = (siteSettings as Record<string, unknown>).taxName as string | undefined
+  const siteTaxRate = siteSettings.taxRate ?? undefined
+  const siteTaxName = siteSettings.taxName ?? undefined
 
   const featuredImageUrl =
     event.featuredImage && typeof event.featuredImage === 'object' && event.featuredImage.url
