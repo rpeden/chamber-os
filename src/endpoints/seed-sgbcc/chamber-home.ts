@@ -45,7 +45,7 @@ export function chamberHomepage({
       type: 'fullBleed',
       textLayout: 'single-text',
       heading:
-        'Supporting business, building community, and coexisting with waterfowl since 1992.',
+        'Supporting business, building community, and coexisting with waterfowl since 2003.',
       media: heroImage.id,
       overlayOpacity: 65,
       ctaButtons: [
